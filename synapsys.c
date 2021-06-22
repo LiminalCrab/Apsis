@@ -119,7 +119,7 @@ int est_server(void)
 
             printf("New connection\n, socket file descriptor: %d\n, IP: %s\n, port: %d\n", new_socket, inet_ntoa(address.sin_addr), ntohs(address.sin_port));
 
-            if ( send (new_socket, message, strlen(message), 0) != strlen(message))
+            if ( send (new_socket, message, strlen(message), 0) != (ssize_t)strlen)
             {
                 perror("send");
             }
