@@ -5,3 +5,6 @@
 
 /* server.c */
 extern int est_server(void);
+
+/* metronome.c */
+extern int metro(int c);
