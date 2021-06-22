@@ -4,4 +4,4 @@
 #include <stdint.h>
 
 /* server.c */
-extern int server_routine(void);
+extern int est_server(void);

@@ -4,7 +4,7 @@
 
 
 int main(void){
-    server_routine();
+    est_server();
 
     return 0;
 }
