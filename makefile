@@ -4,4 +4,4 @@ main: main.o synapsys.o
 	$(CC) $(CFLAGS) -o main main.o synapsys.o
 
 clean:
-	rm -f main.o synapsys.o main
+	rm -f main.o synapsys.o main 
