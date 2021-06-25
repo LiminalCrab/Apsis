@@ -3,7 +3,7 @@
 #include <SDL2/SDL.h> 
 #include "lib/apsisnw.h"
 
-/* 
+/*
  * Parent metronome SDL stuff.
  */
 
@@ -48,6 +48,7 @@ int init(void)
        return printf("SDL_Renderer has failed. %s\n", SDL_GetError());
     
    SDL_Delay(3000);
+   SDL_DestroyWindow(pWindow);
     return 1;
 
 }
