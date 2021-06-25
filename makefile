@@ -1,8 +1,8 @@
 CC=gcc
-CFLAGS?=-Werror -Wextra -Wall -O0 -g3 -pthread -lSDL2
+CFLAGS?= -Wextra -Wall -O0 -g3 -lpthread
 
 main: main.o
-	$(CC) $(CFLAGS)  -o main main.o
+	$(CC) -o main main.o -lSDL2 $(CFLAGS)
 
 clean:
 	rm -f main.o main

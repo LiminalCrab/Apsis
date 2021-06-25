@@ -3,57 +3,45 @@
 #include <SDL2/SDL.h> 
 #include "lib/apsisnw.h"
 
-/*
- * Parent metronome SDL stuff.
- */
-
 SDL_Window *pWindow = NULL;
 SDL_Renderer *pRenderer = NULL;
-SDL_Texture *pTexture = NULL;
+SDL_Surface *pSurface = NULL;
 
-
-/* 
- * Parent metronome destroy.
- */
-
-void quit(void)
-{
-    SDL_DestroyRenderer(pRenderer);
-    pRenderer = NULL;
-    SDL_Quit();
-    exit(0);
-}
-
-/* 
- * Parent metronome window creation 
- */
+#define WIDTH 640
+#define HEIGHT 480
 
 int init(void)
 {
-    if(SDL_InitSubSystem(SDL_INIT_VIDEO) < 0)
-        return printf("SDL_Init has failed: %s\n", SDL_GetError());
-   pWindow = SDL_CreateWindow("Apsis",
-           SDL_WINDOWPOS_UNDEFINED, 
-           SDL_WINDOWPOS_UNDEFINED,
-           640, /* Width */
-           640, /* Heigth  */
-           SDL_WINDOW_SHOWN);
+    pWindow = SDL_CreateWindow("Apsis", SDL_WINDOWPOS_UNDEFINED, 
+                                        SDL_WINDOWPOS_UNDEFINED,
+                                        WIDTH,
+                                        HEIGHT,
+                                        SDL_WINDOW_SHOWN);
+    if (pWindow == NULL)
+    {
+        printf("createWindow: %s\n", SDL_GetError());
+        return 1;
+    }
 
-   if(pWindow == NULL)
-       return printf("SDL_Window has failed %s\n", SDL_GetError());
-   
-    pRenderer = SDL_CreateRenderer(pWindow, -1, 0);
-   
-   if (pRenderer == NULL)
-       return printf("SDL_Renderer has failed. %s\n", SDL_GetError());
-    
-   SDL_Delay(3000);
-   SDL_DestroyWindow(pWindow);
-    return 1;
+    unsigned int sTick = SDL_GetTicks();
+    while (SDL_GetTicks() - sTick < 5000)
+    {
+        SDL_PumpEvents();
+        SDL_RenderSetLogicalSize(pRenderer, WIDTH, HEIGHT);
+        SDL_SetRenderDrawColor(pRenderer, 255, 0, 0, 255);
+        SDL_RenderClear(pRenderer);
+    }
 
+
+    SDL_DestroyWindow(pWindow);
+    SDL_DestroyRenderer(pRenderer);
+    SDL_Quit();
+
+    return 0;
 }
 
-int main(void)
+
+int main(int argc, char* args[])
 {
     init();
     return 0;
