@@ -24,12 +24,13 @@ int init(void)
     }
 
     unsigned int sTick = SDL_GetTicks();
+    pRenderer = SDL_CreateRenderer ( pWindow, -1, 0);
     while (SDL_GetTicks() - sTick < 5000)
     {
-        SDL_PumpEvents();
         SDL_RenderSetLogicalSize(pRenderer, WIDTH, HEIGHT);
-        SDL_SetRenderDrawColor(pRenderer, 255, 0, 0, 255);
+        SDL_SetRenderDrawColor(pRenderer, 255, 255, 255, 255);
         SDL_RenderClear(pRenderer);
+        SDL_RenderPresent(pRenderer);
     }
 
 
