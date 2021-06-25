@@ -1,7 +1,8 @@
 CC=gcc
-CFLAGS?=-Werror -Wextra -Wall -O0 -g3 -pthread
-main: main.o synapsys.o metronome.o
-	$(CC) $(CFLAGS) -o main main.o synapsys.o metronome.o
+CFLAGS?=-Werror -Wextra -Wall -O0 -g3 -pthread -lSDL2
+
+main: main.o
+	$(CC) $(CFLAGS)  -o main main.o
 
 clean:
-	rm -f main.o synapsys.o metronome.o main 
+	rm -f main.o main
