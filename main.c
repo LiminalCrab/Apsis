@@ -78,9 +78,11 @@ apsis_quit(void)
 void 
 on_render(void)
 {
-    SDL_SetRenderDrawColor(pRenderer, 255, 255, 71, 255);
+
     SDL_RenderClear(pRenderer);
-    draw_circle(pRenderer, 20, 20, 100);
+    SDL_SetRenderDrawColor(pRenderer, 255, 87, 51, 255);
+    draw_circle(pRenderer, 260, 260, 160);
+    SDL_SetRenderDrawColor(pRenderer, 255, 255, 255, 255);
     SDL_RenderPresent(pRenderer);
 
 }
