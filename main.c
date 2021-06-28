@@ -1,7 +1,5 @@
 #include <stdio.h>
-#include <unistd.h>
-#include <inttypes.h>
-#include <stdlib.h>
+#include <math.h>
 #include <SDL2/SDL.h> 
 #include "lib/apsisnw.h"
 
@@ -9,59 +7,71 @@ SDL_Window *pWindow = NULL;
 SDL_Renderer *pRenderer = NULL;
 SDL_Texture *pTexture = NULL;
 SDL_Surface *pSurface = NULL;
+Uint32 *pixels;
 
 #define WIDTH 640
 #define HEIGHT 480
+
+typedef enum {
+	SQUARE,
+	ROUND,
+	DIAGONAL
+} LineCap;
+
+
+
 
 /* GNU Style guide will be followed. Please see C Violence by Sigrid here.
  * https://ftrv.se/3
  */
 
-
-
-
 /* Drawing */
 
 void 
-draw_circle(SDL_Renderer *pRenderer, int32_t centreX, int32_t centreY, int32_t radius)
+draw_hollow_circle(SDL_Renderer *renderer, int centerx, int centery, int radius)
 {
-    int32_t x = (radius - 1);
-    int32_t y = 0;
+  // Draws a hollow circle with the given position and radius
 
-    while (x >= y)
+  int diameter = (radius * 2);
+
+  int x = radius - 1;
+  int y = 0;
+  int tx = 1;
+  int ty = 1;
+  int error = tx - diameter;
+
+  while (x >= y)
+  {
+    // Each renders an octant of the circle
+    SDL_RenderDrawPoint(pRenderer, centerx + x, centery + y);
+    SDL_RenderDrawPoint(pRenderer, centerx + x, centery - y);
+    SDL_RenderDrawPoint(pRenderer, centerx - x, centery + y);
+    SDL_RenderDrawPoint(pRenderer, centerx - x, centery - y);
+    SDL_RenderDrawPoint(pRenderer, centerx + y, centery - x);
+    SDL_RenderDrawPoint(pRenderer, centerx + y, centery + x);
+    SDL_RenderDrawPoint(pRenderer, centerx - y, centery - x);
+    SDL_RenderDrawPoint(pRenderer, centerx - y, centery + x);
+
+    if (error <= 0)
     {
-        SDL_RenderDrawPoint(pRenderer, centreX + x, centreY - y);
-        SDL_RenderDrawPoint(pRenderer, centreX + x, centreY + y);
-        SDL_RenderDrawPoint(pRenderer, centreX - x, centreY - y);
-        SDL_RenderDrawPoint(pRenderer, centreX - x, centreY + y);
-        SDL_RenderDrawPoint(pRenderer, centreX + y, centreY - x);
-        SDL_RenderDrawPoint(pRenderer, centreX + y, centreY + x);
-        SDL_RenderDrawPoint(pRenderer, centreX - y, centreY - x);
-        SDL_RenderDrawPoint(pRenderer, centreX - y, centreY + x);
-
-        int32_t diameter = (radius * 2);
-        int32_t tix = 1;
-        int32_t tiy = 1;
-        int32_t error = (tix - diameter);
-
-        if (error <= 0)
-        {
-            ++y; 
-            error += tiy;
-            tiy += 2;
-        }
-        if (error > 0)
-        {
-            --x;
-            tix += 2;
-            error += (tix - diameter);
-        }
+      ++y;
+      error += ty;
+      ty += 2;
     }
+
+    if (error > 0)
+    {
+      --x;
+      tx += 2;
+      error += (tx - diameter);
+    }
+  }
 }
 
+/* Render  */
+
+
 /* Setup */
-
-
 
 void 
 apsis_quit(void)
@@ -81,7 +91,7 @@ on_render(void)
 
     SDL_RenderClear(pRenderer);
     SDL_SetRenderDrawColor(pRenderer, 255, 87, 51, 255);
-    draw_circle(pRenderer, 260, 260, 460);
+    draw_hollow_circle(pRenderer, 200, 200, 200 );
     SDL_SetRenderDrawColor(pRenderer, 255, 255, 255, 255);
     SDL_RenderPresent(pRenderer);
 
