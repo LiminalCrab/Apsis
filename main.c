@@ -7,19 +7,10 @@ SDL_Window *pWindow = NULL;
 SDL_Renderer *pRenderer = NULL;
 SDL_Texture *pTexture = NULL;
 SDL_Surface *pSurface = NULL;
-Uint32 *pixels;
+
 
 #define WIDTH 640
 #define HEIGHT 480
-
-typedef enum {
-	SQUARE,
-	ROUND,
-	DIAGONAL
-} LineCap;
-
-
-
 
 /* GNU Style guide will be followed. Please see C Violence by Sigrid here.
  * https://ftrv.se/3
@@ -28,9 +19,9 @@ typedef enum {
 /* Drawing */
 
 void 
-draw_hollow_circle(SDL_Renderer *renderer, int centerx, int centery, int radius)
+draw_UnfilledCircle(SDL_Renderer *renderer, int centerx, int centery, int radius)
 {
-  // Draws a hollow circle with the given position and radius
+  // Draws an empty circle with the given position and radius
 
   int diameter = (radius * 2);
 
@@ -86,12 +77,12 @@ apsis_quit(void)
 }
 
 void 
-on_render(void)
+testRender(void)
 {
 
     SDL_RenderClear(pRenderer);
     SDL_SetRenderDrawColor(pRenderer, 255, 87, 51, 255);
-    draw_hollow_circle(pRenderer, 200, 200, 200 );
+    draw_UnfilledCircle(pRenderer, 200, 200, 200 );
     SDL_SetRenderDrawColor(pRenderer, 255, 255, 255, 255);
     SDL_RenderPresent(pRenderer);
 
@@ -132,7 +123,7 @@ init(void)
         printf("SDL_CreateTexture:%s\n", SDL_GetError());
     }
 
-    on_render();
+    testRender();
 
     return 1; 
 }
