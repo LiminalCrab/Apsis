@@ -21,65 +21,69 @@ void
 apsis_quit(void)
 {
     SDL_DestroyWindow(pWindow);
+    pWindow = NULL;
     SDL_DestroyRenderer(pRenderer);
+    pRenderer = NULL;
+    SDL_FreeSurface(pSurface);
+    pSurface = NULL;
     SDL_Quit();
 }
 
-int
+int 
 init(void)
 {
-    is_running = 1;
+    int success = 1;
 
-    pWindow = SDL_CreateWindow("Apsis", SDL_WINDOWPOS_UNDEFINED, 
-                                        SDL_WINDOWPOS_UNDEFINED,
-                                        WIDTH,
-                                        HEIGHT,
-                                        SDL_WINDOW_SHOWN);
-    if (pWindow == NULL)
+    if (SDL_Init(SDL_INIT_VIDEO) < 0)
     {
-        printf("createWindow: %s\n", SDL_GetError());
-        is_running = 1;
+        printf("SDL_Init: %s\n", SDL_GetError());
+        success = 0;
+    }
+    else 
+    {
+        pWindow = SDL_CreateWindow("Apsis", 
+                                    SDL_WINDOWPOS_UNDEFINED, 
+                                    SDL_WINDOWPOS_UNDEFINED, 
+                                    WIDTH, 
+                                    HEIGHT, 
+                                    SDL_WINDOW_SHOWN);
+        if (pWindow == NULL )
+        {
+            printf("SDL_CreateWindow: %s\n", SDL_GetError());
+            success = 0;
+        }
+        else 
+            pSurface = SDL_GetWindowSurface( pWindow );
+
     }
 
-    unsigned int sTick = SDL_GetTicks();
-    pRenderer = SDL_CreateRenderer ( pWindow, -1, 0);
-    while (is_running == 1)
-    {
-        SDL_RenderSetLogicalSize(pRenderer, WIDTH, HEIGHT);
-        SDL_SetRenderDrawColor(pRenderer, 255, 255, 255, 255);
-        SDL_RenderClear(pRenderer);
-        SDL_RenderPresent(pRenderer);
-    }
-
-    if (is_running == 0)
-    {
-        apsis_quit();
-    }
-
-    return 0;
+    return success; 
 }
 
 
-int 
-main(int argc, char* argv[])
+int
+main(void)
 {
-    int opt;
-    while((opt = getopt(argc, argv, "isq")) != -1)
+    if (!init())
     {
-        switch(opt)
-        {
-            case 'i':
-                init();
-                break;
-            case 's':
-                printf("Server option is WIP.");
-                exit(1);
-                break;
-            case 'q':
-                is_running = 0;
-                apsis_quit();
-                break;
-        }
+        printf("Main failed to initalize");
     }
+
+    int quit = 0;
+
+    SDL_Event event_exit;
+    while (!quit)
+    {
+        while(SDL_PollEvent( &event_exit ) != 0 )
+        {
+            if (event_exit.type == SDL_QUIT )
+            {
+                quit = 1;
+            }
+        }
+
+    }
+    
+    apsis_quit();
     return 0;
 }
