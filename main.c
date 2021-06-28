@@ -1,4 +1,6 @@
 #include <stdio.h>
+#include <unistd.h>
+#include <inttypes.h>
 #include <stdlib.h>
 #include <SDL2/SDL.h> 
 #include "lib/apsisnw.h"
@@ -9,9 +11,25 @@ SDL_Surface *pSurface = NULL;
 
 #define WIDTH 640
 #define HEIGHT 480
+int is_running = 0;
 
-int init(void)
+/* GNU Style guide will be followed. Please see C Violence by Sigrid here.
+ * https://ftrv.se/3
+ */
+
+void 
+apsis_quit(void)
 {
+    SDL_DestroyWindow(pWindow);
+    SDL_DestroyRenderer(pRenderer);
+    SDL_Quit();
+}
+
+int
+init(void)
+{
+    is_running = 1;
+
     pWindow = SDL_CreateWindow("Apsis", SDL_WINDOWPOS_UNDEFINED, 
                                         SDL_WINDOWPOS_UNDEFINED,
                                         WIDTH,
@@ -20,12 +38,12 @@ int init(void)
     if (pWindow == NULL)
     {
         printf("createWindow: %s\n", SDL_GetError());
-        return 1;
+        is_running = 1;
     }
 
     unsigned int sTick = SDL_GetTicks();
     pRenderer = SDL_CreateRenderer ( pWindow, -1, 0);
-    while (SDL_GetTicks() - sTick < 5000)
+    while (is_running == 1)
     {
         SDL_RenderSetLogicalSize(pRenderer, WIDTH, HEIGHT);
         SDL_SetRenderDrawColor(pRenderer, 255, 255, 255, 255);
@@ -33,17 +51,35 @@ int init(void)
         SDL_RenderPresent(pRenderer);
     }
 
-
-    SDL_DestroyWindow(pWindow);
-    SDL_DestroyRenderer(pRenderer);
-    SDL_Quit();
+    if (is_running == 0)
+    {
+        apsis_quit();
+    }
 
     return 0;
 }
 
 
-int main(int argc, char* args[])
+int 
+main(int argc, char* argv[])
 {
-    init();
+    int opt;
+    while((opt = getopt(argc, argv, "isq")) != -1)
+    {
+        switch(opt)
+        {
+            case 'i':
+                init();
+                break;
+            case 's':
+                printf("Server option is WIP.");
+                exit(1);
+                break;
+            case 'q':
+                is_running = 0;
+                apsis_quit();
+                break;
+        }
+    }
     return 0;
 }
