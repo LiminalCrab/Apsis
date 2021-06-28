@@ -7,8 +7,9 @@
 
 SDL_Window *pWindow = NULL;
 SDL_Renderer *pRenderer = NULL;
-SDL_Surface *pSurface = NULL;
-
+SDL_Texture *pTexture = NULL;
+SDL_Surface *pSurface = NULL
+;
 #define WIDTH 640
 #define HEIGHT 480
 
@@ -89,11 +90,24 @@ init(void)
         {
             printf("SDL_CreateWindow: %s\n", SDL_GetError());
         }
-        else
-        {  
-            pSurface = SDL_GetWindowSurface( pWindow );
+            else 
+            {
+                pSurface = SDL_GetWindowSurface(pWindow);
+            }
+        pRenderer = SDL_CreateRenderer(pWindow, -1, 0);
+        if (pRenderer == NULL)
+        {
+            printf("SDL_CreateRenderer: %s\n", SDL_GetError());
         }
-
+        pTexture = SDL_CreateTexture(pRenderer, SDL_PIXELFORMAT_ARGB8888, SDL_TEXTUREACCESS_STATIC, WIDTH, HEIGHT);
+        if (pTexture == NULL)
+        {
+            printf("SDL_CreateTexture: %s\n", SDL_GetError());
+        }
+        SDL_RenderClear(pRenderer);
+        draw_circle(pRenderer, 50, 50, 200);
+        SDL_RenderPresent(pRenderer);
+        
     }
 
     return 0; 
