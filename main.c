@@ -19,7 +19,8 @@ SDL_Surface *pSurface = NULL;
 
 /* Drawing */
 
-void draw_circle(SDL_Renderer *pRenderer, int32_t centerX, int32_t centerY, int32_t radius)
+void 
+draw_circle(SDL_Renderer *pRenderer, int32_t centerX, int32_t centerY, int32_t radius)
 {
     int32_t x = (radius - 1);
     int32_t y = 0;
@@ -71,12 +72,10 @@ apsis_quit(void)
 int 
 init(void)
 {
-    int success = 1;
 
     if (SDL_Init(SDL_INIT_VIDEO) < 0)
     {
         printf("SDL_Init: %s\n", SDL_GetError());
-        success = 0;
     }
     else 
     {
@@ -89,14 +88,15 @@ init(void)
         if (pWindow == NULL )
         {
             printf("SDL_CreateWindow: %s\n", SDL_GetError());
-            success = 0;
         }
-        else 
+        else
+        {  
             pSurface = SDL_GetWindowSurface( pWindow );
+        }
 
     }
 
-    return success; 
+    return 0; 
 }
 
 
