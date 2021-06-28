@@ -11,12 +11,51 @@ SDL_Surface *pSurface = NULL;
 
 #define WIDTH 640
 #define HEIGHT 480
-int is_running = 0;
 
 /* GNU Style guide will be followed. Please see C Violence by Sigrid here.
  * https://ftrv.se/3
  */
 
+
+/* Drawing */
+
+void draw_circle(SDL_Renderer *pRenderer, int32_t centerX, int32_t centerY, int32_t radius)
+{
+    int32_t x = (radius - 1);
+    int32_t y = 0;
+
+    while (x >= y)
+    {
+        SDL_RenderDrawPoint(pRenderer, centerX + x, centerY - y);
+        SDL_RenderDrawPoint(pRenderer, centerX + x, centerY + y);
+        SDL_RenderDrawPoint(pRenderer, centerX - x, centerY - y);
+        SDL_RenderDrawPoint(pRenderer, centerX - x, centerY + y);
+        SDL_RenderDrawPoint(pRenderer, centerX + y, centerY - x);
+        SDL_RenderDrawPoint(pRenderer, centerX + y, centerY + x);
+        SDL_RenderDrawPoint(pRenderer, centerX - y, centerY - x);
+        SDL_RenderDrawPoint(pRenderer, centerX - y, centerY + x);
+        
+        int32_t diameter = (radius * 2);
+        int32_t tix = 1;
+        int32_t tiy = 1;
+        int32_t error = (tix - diameter);
+
+        if (error <= 0)
+        {
+            ++y; 
+            error += tiy;
+            tiy += 2;
+        }
+        if (error > 0)
+        {
+            --x;
+            tix += 2;
+            error += (tix - diameter);
+        }
+    }
+}
+
+/* Setup */
 void 
 apsis_quit(void)
 {
