@@ -8,8 +8,8 @@
 SDL_Window *pWindow = NULL;
 SDL_Renderer *pRenderer = NULL;
 SDL_Texture *pTexture = NULL;
-SDL_Surface *pSurface = NULL
-;
+SDL_Surface *pSurface = NULL;
+
 #define WIDTH 640
 #define HEIGHT 480
 
@@ -18,25 +18,27 @@ SDL_Surface *pSurface = NULL
  */
 
 
+
+
 /* Drawing */
 
 void 
-draw_circle(SDL_Renderer *pRenderer, int32_t centerX, int32_t centerY, int32_t radius)
+draw_circle(SDL_Renderer *pRenderer, int32_t centreX, int32_t centreY, int32_t radius)
 {
     int32_t x = (radius - 1);
     int32_t y = 0;
 
     while (x >= y)
     {
-        SDL_RenderDrawPoint(pRenderer, centerX + x, centerY - y);
-        SDL_RenderDrawPoint(pRenderer, centerX + x, centerY + y);
-        SDL_RenderDrawPoint(pRenderer, centerX - x, centerY - y);
-        SDL_RenderDrawPoint(pRenderer, centerX - x, centerY + y);
-        SDL_RenderDrawPoint(pRenderer, centerX + y, centerY - x);
-        SDL_RenderDrawPoint(pRenderer, centerX + y, centerY + x);
-        SDL_RenderDrawPoint(pRenderer, centerX - y, centerY - x);
-        SDL_RenderDrawPoint(pRenderer, centerX - y, centerY + x);
-        
+        SDL_RenderDrawPoint(pRenderer, centreX + x, centreY - y);
+        SDL_RenderDrawPoint(pRenderer, centreX + x, centreY + y);
+        SDL_RenderDrawPoint(pRenderer, centreX - x, centreY - y);
+        SDL_RenderDrawPoint(pRenderer, centreX - x, centreY + y);
+        SDL_RenderDrawPoint(pRenderer, centreX + y, centreY - x);
+        SDL_RenderDrawPoint(pRenderer, centreX + y, centreY + x);
+        SDL_RenderDrawPoint(pRenderer, centreX - y, centreY - x);
+        SDL_RenderDrawPoint(pRenderer, centreX - y, centreY + x);
+
         int32_t diameter = (radius * 2);
         int32_t tix = 1;
         int32_t tiy = 1;
@@ -58,6 +60,9 @@ draw_circle(SDL_Renderer *pRenderer, int32_t centerX, int32_t centerY, int32_t r
 }
 
 /* Setup */
+
+
+
 void 
 apsis_quit(void)
 {
@@ -70,6 +75,16 @@ apsis_quit(void)
     SDL_Quit();
 }
 
+void 
+on_render(void)
+{
+    SDL_SetRenderDrawColor(pRenderer, 255, 255, 71, 255);
+    SDL_RenderClear(pRenderer);
+    draw_circle(pRenderer, 20, 20, 100);
+    SDL_RenderPresent(pRenderer);
+
+}
+
 int 
 init(void)
 {
@@ -78,39 +93,36 @@ init(void)
     {
         printf("SDL_Init: %s\n", SDL_GetError());
     }
-    else 
+    
+    pWindow = SDL_CreateWindow("Apsis", 
+                                SDL_WINDOWPOS_UNDEFINED, 
+                                SDL_WINDOWPOS_UNDEFINED, 
+                                WIDTH, 
+                                HEIGHT, 
+                                SDL_WINDOW_SHOWN);
+    
+    if (pWindow == NULL )
     {
-        pWindow = SDL_CreateWindow("Apsis", 
-                                    SDL_WINDOWPOS_UNDEFINED, 
-                                    SDL_WINDOWPOS_UNDEFINED, 
-                                    WIDTH, 
-                                    HEIGHT, 
-                                    SDL_WINDOW_SHOWN);
-        if (pWindow == NULL )
-        {
-            printf("SDL_CreateWindow: %s\n", SDL_GetError());
-        }
-            else 
-            {
-                pSurface = SDL_GetWindowSurface(pWindow);
-            }
-        pRenderer = SDL_CreateRenderer(pWindow, -1, 0);
-        if (pRenderer == NULL)
-        {
-            printf("SDL_CreateRenderer: %s\n", SDL_GetError());
-        }
-        pTexture = SDL_CreateTexture(pRenderer, SDL_PIXELFORMAT_ARGB8888, SDL_TEXTUREACCESS_STATIC, WIDTH, HEIGHT);
-        if (pTexture == NULL)
-        {
-            printf("SDL_CreateTexture: %s\n", SDL_GetError());
-        }
-        SDL_RenderClear(pRenderer);
-        draw_circle(pRenderer, 50, 50, 200);
-        SDL_RenderPresent(pRenderer);
-        
+        printf("SDL_CreateWindow: %s\n", SDL_GetError());
     }
 
-    return 0; 
+    pRenderer = SDL_CreateRenderer(pWindow, -1, 0);
+
+    if (pRenderer == NULL)
+    {
+        printf("SDL_CreateRenderer:%s\n", SDL_GetError());
+    }
+
+    pTexture = SDL_CreateTexture(pRenderer, SDL_PIXELFORMAT_ARGB8888, SDL_TEXTUREACCESS_STATIC, WIDTH, HEIGHT);
+    
+    if (pTexture == NULL)
+    {
+        printf("SDL_CreateTexture:%s\n", SDL_GetError());
+    }
+
+    on_render();
+
+    return 1; 
 }
 
 
@@ -119,12 +131,13 @@ main(void)
 {
     if (!init())
     {
-        printf("Main failed to initalize");
+        printf("Init failed.");
     }
 
     int quit = 0;
 
     SDL_Event event_exit;
+    
     while (!quit)
     {
         while(SDL_PollEvent( &event_exit ) != 0 )
@@ -132,6 +145,7 @@ main(void)
             if (event_exit.type == SDL_QUIT )
             {
                 quit = 1;
+                apsis_quit();
             }
         }
 
