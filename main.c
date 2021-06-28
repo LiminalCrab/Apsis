@@ -81,7 +81,7 @@ on_render(void)
 
     SDL_RenderClear(pRenderer);
     SDL_SetRenderDrawColor(pRenderer, 255, 87, 51, 255);
-    draw_circle(pRenderer, 260, 260, 160);
+    draw_circle(pRenderer, 260, 260, 460);
     SDL_SetRenderDrawColor(pRenderer, 255, 255, 255, 255);
     SDL_RenderPresent(pRenderer);
 
