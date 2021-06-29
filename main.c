@@ -19,36 +19,28 @@ int yCenter = HEIGHT / 2;
  * https://ftrv.se/3
  */
 
-/* Rotate the x endpoint */
-double
-rotator_xE(void)
-{
-  double xdef = 320;
-  double rotate_x = xdef;
 
-  return rotate_x; 
-}
-
-/* Rotate the y endpoint */
-double
-rotator_yE(void)
-{
-  double ydef = 100;
-  double rotate_y = ydef;
-  return rotate_y; 
-}
 
 /* Drawing */
 
 void 
-draw_Phasor(SDL_Renderer *pRenderer, 
-              double xS, /* x coords start point */
-              double yS, /* y coords start point */
-              double xE, /* x coords end point */
-              double yE) /* y coords end point */
+draw_RotPhasor(SDL_Renderer *pRenderer, 
+              int oX, /* x coords start point */
+              int oY, /* y coords start point */
+              unsigned pX, /* x coords end point */
+              unsigned pY) /* y coords end point */
   {
-    SDL_RenderDrawLine(pRenderer, xS, yS, xE, yE);
+    int  isActive = 0;
+    
+
+    /* convert to degrees */ 
+    double radians = 2.0;
+    double deg = radians * (180.0 / PI);
+    printf("%d\n", deg);
+    SDL_RenderDrawLine(pRenderer, oX, oY, pX, pY);
+    
   }
+
 
 void 
 draw_UnfilledCircle(SDL_Renderer *pRenderer, 
@@ -114,7 +106,7 @@ testRender(void)
     SDL_SetRenderDrawColor(pRenderer, 255, 255, 255, 255);
     draw_UnfilledCircle(pRenderer, xCenter, yCenter, 160 );
     SDL_SetRenderDrawColor(pRenderer, 255, 255, 255, 255);
-    draw_Phasor(pRenderer, xCenter, yCenter, 320, 100);
+    draw_RotPhasor(pRenderer, xCenter, yCenter, 320, 100);
     SDL_SetRenderDrawColor(pRenderer, 255, 255, 255, 255);
     SDL_RenderPresent(pRenderer);
 
