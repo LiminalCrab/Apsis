@@ -10,6 +10,7 @@ SDL_Texture *pTexture = NULL;
 
 #define WIDTH 640
 #define HEIGHT 480
+#define PI 3.14159265
 
 int xCenter = WIDTH / 2; 
 int yCenter = HEIGHT / 2;
@@ -20,19 +21,18 @@ int yCenter = HEIGHT / 2;
 
 /* Drawing */
 
-
 void 
-draw_Phasor(SDL_Renderer *renderer, 
-              int x0, /* x coords start point */
-              int y0, /* y coords start point */
-              int x1, /* x coords end point */
-              int y1) /* y coords end point */
+draw_Phasor(SDL_Renderer *pRenderer, 
+              double xS, /* x coords start point */
+              double yS, /* y coords start point */
+              double xE, /* x coords end point */
+              double yE) /* y coords end point */
   {
-    SDL_RenderDrawLine(pRenderer, x0, y0, x1, y1);
+    SDL_RenderDrawLine(pRenderer, xS, yS, xE, yE);
   }
 
 void 
-draw_UnfilledCircle(SDL_Renderer *renderer, 
+draw_UnfilledCircle(SDL_Renderer *pRenderer, 
                                   int centerx,
                                   int centery, 
                                   int radius)
@@ -92,10 +92,10 @@ testRender(void)
 {
 
     SDL_RenderClear(pRenderer);
-    SDL_SetRenderDrawColor(pRenderer, 255, 87, 51, 255);
+    SDL_SetRenderDrawColor(pRenderer, 255, 255, 255, 255);
     draw_UnfilledCircle(pRenderer, xCenter, yCenter, 160 );
-    SDL_SetRenderDrawColor(pRenderer, 255, 87, 51, 255);
-    draw_Phasor(pRenderer, xCenter, yCenter, 380, 150);
+    SDL_SetRenderDrawColor(pRenderer, 255, 255, 255, 255);
+    draw_Phasor(pRenderer, xCenter, yCenter, 320, 100);
     SDL_SetRenderDrawColor(pRenderer, 255, 255, 255, 255);
     SDL_RenderPresent(pRenderer);
 
