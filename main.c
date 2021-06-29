@@ -12,6 +12,7 @@ SDL_Texture *pTexture = NULL;
 #define HEIGHT 480
 #define PI 3.14159265
 
+int quit = 0;
 int xCenter = WIDTH / 2; 
 int yCenter = HEIGHT / 2;
 
@@ -19,26 +20,34 @@ int yCenter = HEIGHT / 2;
  * https://ftrv.se/3
  */
 
-
-
 /* Drawing */
 
 void 
 draw_RotPhasor(SDL_Renderer *pRenderer, 
-              int oX, /* x coords start point */
-              int oY, /* y coords start point */
-              unsigned pX, /* x coords end point */
-              unsigned pY) /* y coords end point */
-  {
-    int  isActive = 0;
-    
+              double oX, /* x coords start point */
+              double oY, /* y coords start point */
+              double pX, /* x coords end point */
+              double pY) /* y coords end point */
+  {  
 
-    /* convert to degrees */ 
-    double radians = 2.0;
-    double deg = radians * (180.0 / PI);
-    printf("%d\n", deg);
-    SDL_RenderDrawLine(pRenderer, oX, oY, pX, pY);
+    /* convert to degrees */
+
+    double radians = 0.0;
+    double angle = radians * PI / 180;
+    printf("Degrees: %f\n", angle);
     
+    /* rotate around origin point */
+    double dX = (cos(angle) * (pX - oX)) - (sin(angle) * (pY - oY)) + oX;
+    printf("deltaX: %f\n", dX);    
+    double dY = (sin(angle) * (pX - oX)) + (cos(angle) * (pY - oY)) + oY;
+    printf("deltaY: %f\n", dY);
+    pX += dX;
+    pY += dY;
+    printf("translate pX: %f\n", pX);
+    printf("translate pY: %f\n", pY);
+
+    SDL_RenderDrawLine(pRenderer, oX, oY, pX, pY); 
+
   }
 
 
@@ -101,12 +110,21 @@ apsis_quit(void)
 void 
 testRender(void)
 {
+    int x = 320;
+    int y = 100;
 
     SDL_RenderClear(pRenderer);
     SDL_SetRenderDrawColor(pRenderer, 255, 255, 255, 255);
     draw_UnfilledCircle(pRenderer, xCenter, yCenter, 160 );
-    SDL_SetRenderDrawColor(pRenderer, 255, 255, 255, 255);
-    draw_RotPhasor(pRenderer, xCenter, yCenter, 320, 100);
+    while(x < 400 )
+    {
+        x++;
+        y++;
+        printf("Phasor x actual: %d\n", x);
+        printf("Phasor y actual: %d\n", y);
+        SDL_SetRenderDrawColor(pRenderer, 255, 255, 255, 255);
+        draw_RotPhasor(pRenderer, xCenter, yCenter, x, y );
+    }
     SDL_SetRenderDrawColor(pRenderer, 255, 255, 255, 255);
     SDL_RenderPresent(pRenderer);
 
@@ -165,7 +183,6 @@ main(void)
         printf("Init failed.");
     }
 
-    int quit = 0;
 
     SDL_Event event_exit;
     
