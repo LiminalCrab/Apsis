@@ -19,6 +19,25 @@ int yCenter = HEIGHT / 2;
  * https://ftrv.se/3
  */
 
+/* Rotate the x endpoint */
+double
+rotator_xE(void)
+{
+  double xdef = 320;
+  double rotate_x = xdef;
+
+  return rotate_x; 
+}
+
+/* Rotate the y endpoint */
+double
+rotator_yE(void)
+{
+  double ydef = 100;
+  double rotate_y = ydef;
+  return rotate_y; 
+}
+
 /* Drawing */
 
 void 
