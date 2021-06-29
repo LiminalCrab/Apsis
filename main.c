@@ -6,11 +6,13 @@
 SDL_Window *pWindow = NULL;
 SDL_Renderer *pRenderer = NULL;
 SDL_Texture *pTexture = NULL;
-SDL_Surface *pSurface = NULL;
 
 
 #define WIDTH 640
 #define HEIGHT 480
+
+int xCenter = WIDTH / 2; 
+int yCenter = HEIGHT / 2;
 
 /* GNU Style guide will be followed. Please see C Violence by Sigrid here.
  * https://ftrv.se/3
@@ -18,8 +20,22 @@ SDL_Surface *pSurface = NULL;
 
 /* Drawing */
 
+
 void 
-draw_UnfilledCircle(SDL_Renderer *renderer, int centerx, int centery, int radius)
+draw_Phasor(SDL_Renderer *renderer, 
+              int x0, /* x coords start point */
+              int y0, /* y coords start point */
+              int x1, /* x coords end point */
+              int y1) /* y coords end point */
+  {
+    SDL_RenderDrawLine(pRenderer, x0, y0, x1, y1);
+  }
+
+void 
+draw_UnfilledCircle(SDL_Renderer *renderer, 
+                                  int centerx,
+                                  int centery, 
+                                  int radius)
 {
   // Draws an empty circle with the given position and radius
 
@@ -59,9 +75,6 @@ draw_UnfilledCircle(SDL_Renderer *renderer, int centerx, int centery, int radius
   }
 }
 
-/* Render  */
-
-
 /* Setup */
 
 void 
@@ -71,8 +84,6 @@ apsis_quit(void)
     pWindow = NULL;
     SDL_DestroyRenderer(pRenderer);
     pRenderer = NULL;
-    SDL_FreeSurface(pSurface);
-    pSurface = NULL;
     SDL_Quit();
 }
 
@@ -82,7 +93,9 @@ testRender(void)
 
     SDL_RenderClear(pRenderer);
     SDL_SetRenderDrawColor(pRenderer, 255, 87, 51, 255);
-    draw_UnfilledCircle(pRenderer, 200, 200, 200 );
+    draw_UnfilledCircle(pRenderer, xCenter, yCenter, 160 );
+    SDL_SetRenderDrawColor(pRenderer, 255, 87, 51, 255);
+    draw_Phasor(pRenderer, xCenter, yCenter, 380, 150);
     SDL_SetRenderDrawColor(pRenderer, 255, 255, 255, 255);
     SDL_RenderPresent(pRenderer);
 
@@ -116,7 +129,11 @@ init(void)
         printf("SDL_CreateRenderer:%s\n", SDL_GetError());
     }
 
-    pTexture = SDL_CreateTexture(pRenderer, SDL_PIXELFORMAT_ARGB8888, SDL_TEXTUREACCESS_STATIC, WIDTH, HEIGHT);
+    pTexture = SDL_CreateTexture(pRenderer, 
+                                SDL_PIXELFORMAT_ARGB8888, 
+                                SDL_TEXTUREACCESS_STATIC, 
+                                WIDTH, 
+                                HEIGHT);
     
     if (pTexture == NULL)
     {
