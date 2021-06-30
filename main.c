@@ -32,9 +32,6 @@ int apsis_quit(void)
     return 0;
 }
 
-/* Drawing */
-
-/* spinRadius is the radius of the circle. */
 void draw_RotPhasor(SDL_Renderer *pRenderer, double originX, 
                     double originY, double radius)  
 {  
