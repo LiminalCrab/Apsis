@@ -50,9 +50,9 @@ void draw_RotPhasor(SDL_Renderer *pRenderer, double originX,
     printf("Degrees: %f\n", angle);
     
     /* rotate around origin point */
-    double deltaX = originY + cos(angle)*radius;
+    double deltaX = originX + cos(angle)*radius;
     printf("deltaX: %f\n", deltaX);    
-    double deltaY = originX + sin(angle)*radius;
+    double deltaY = originY + sin(angle)*radius;
     printf("deltaY: %f\n", deltaY);
    
     printf("angle:  %f\n", angle);
@@ -109,7 +109,7 @@ int render(void)
   double angle = 0.0;
   int count = 0;
 
-  while (count < 5000)
+  while (count < 500)
   {
     double speed = 0.1;
     double angle = speed * get_time();
