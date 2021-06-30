@@ -12,23 +12,15 @@ SDL_Texture *pTexture = NULL;
 #define HEIGHT 480
 #define PI 3.14159265
 
-int quit = 0;
 int xCenter = WIDTH / 2; 
 int yCenter = HEIGHT / 2;
-
-/* GNU Style guide will be followed. Please see C Violence by Sigrid here.
- * https://ftrv.se/3
- */
+int FPS = 30;
 
 /* Drawing */
 
-void 
-draw_RotPhasor(SDL_Renderer *pRenderer, 
-              double oX, /* x coords start point */
-              double oY, /* y coords start point */
-              double pX, /* x coords end point */
-              double pY) /* y coords end point */
-  {  
+void draw_RotPhasor(SDL_Renderer *pRenderer, double originX, 
+                    double originY, double pointX, double pointY) 
+{  
 
     /* convert to degrees */
 
@@ -37,25 +29,23 @@ draw_RotPhasor(SDL_Renderer *pRenderer,
     printf("Degrees: %f\n", angle);
     
     /* rotate around origin point */
-    double dX = (cos(angle) * (pX - oX)) - (sin(angle) * (pY - oY)) + oX;
-    printf("deltaX: %f\n", dX);    
-    double dY = (sin(angle) * (pX - oX)) + (cos(angle) * (pY - oY)) + oY;
-    printf("deltaY: %f\n", dY);
-    pX += dX;
-    pY += dY;
-    printf("translate pX: %f\n", pX);
-    printf("translate pY: %f\n", pY);
+    double deltaX = (cos(angle) * (pointX - originX)) - (sin(angle) * (pointY - originY)) + originX;
+    printf("deltaX: %f\n", deltaX);    
+    double deltaY = (sin(angle) * (pointX - originX)) + (cos(angle) * (pointY - originY)) + originY;
+    printf("deltaY: %f\n", deltaY);
 
-    SDL_RenderDrawLine(pRenderer, oX, oY, pX, pY); 
+    pointX += deltaX;
+    pointY += deltaY;
 
-  }
+    printf("translate pX: %f\n", pointX);
+    printf("translate pY: %f\n", pointY);
+
+    SDL_RenderDrawLine(pRenderer, originX, originY, pointX, pointY); 
+
+ }
 
 
-void 
-draw_UnfilledCircle(SDL_Renderer *pRenderer, 
-                                  int centerx,
-                                  int centery, 
-                                  int radius)
+void draw_UnfilledCircle(SDL_Renderer *pRenderer, int centerx, int centery, int radius)
 {
   // Draws an empty circle with the given position and radius
 
@@ -69,6 +59,7 @@ draw_UnfilledCircle(SDL_Renderer *pRenderer,
 
   while (x >= y)
   {
+   
     // Each renders an octant of the circle
     SDL_RenderDrawPoint(pRenderer, centerx + x, centery + y);
     SDL_RenderDrawPoint(pRenderer, centerx + x, centery - y);
@@ -95,6 +86,36 @@ draw_UnfilledCircle(SDL_Renderer *pRenderer,
   }
 }
 
+/* Render  */
+
+int render(void)
+{
+
+  int x = 320; //temp
+  int y = 100; //temp
+  
+  while ( x > 500 )
+  {
+    x++;
+    y++;
+
+    printf("Phasor X actual: %d\n", x);
+    printf("Phasor Y actual: %d\n", y);
+
+    SDL_RenderClear(pRenderer);
+    SDL_SetRenderDrawColor(pRenderer, 255, 255, 255, 255); //circle
+    draw_UnfilledCircle(pRenderer, xCenter, yCenter, 160);
+    SDL_SetRenderDrawColor(pRenderer, 255, 255, 255, 255); //phasor
+    draw_RotPhasor(pRenderer, xCenter, yCenter, x, y);
+    SDL_SetRenderDrawColor(pRenderer, 0, 0, 0, 255); //background
+    SDL_RenderPresent(pRenderer);
+  }
+
+  return 1;
+}
+
+
+
 /* Setup */
 
 void 
@@ -105,29 +126,6 @@ apsis_quit(void)
     SDL_DestroyRenderer(pRenderer);
     pRenderer = NULL;
     SDL_Quit();
-}
-
-void 
-testRender(void)
-{
-    int x = 320;
-    int y = 100;
-
-    SDL_RenderClear(pRenderer);
-    SDL_SetRenderDrawColor(pRenderer, 255, 255, 255, 255);
-    draw_UnfilledCircle(pRenderer, xCenter, yCenter, 160 );
-    while(x < 400 )
-    {
-        x++;
-        y++;
-        printf("Phasor x actual: %d\n", x);
-        printf("Phasor y actual: %d\n", y);
-        SDL_SetRenderDrawColor(pRenderer, 255, 255, 255, 255);
-        draw_RotPhasor(pRenderer, xCenter, yCenter, x, y );
-    }
-    SDL_SetRenderDrawColor(pRenderer, 255, 255, 255, 255);
-    SDL_RenderPresent(pRenderer);
-
 }
 
 int 
@@ -169,34 +167,50 @@ init(void)
         printf("SDL_CreateTexture:%s\n", SDL_GetError());
     }
 
-    testRender();
+    render();
 
     return 1; 
 }
 
 
-int
-main(void)
+int main(void)
 {
+  int quit = 0;
+
+    
     if (!init())
     {
         printf("Init failed.");
     }
-
-
-    SDL_Event event_exit;
     
+    int nTick = 0;
+
     while (!quit)
     {
-        while(SDL_PollEvent( &event_exit ) != 0 )
-        {
-            if (event_exit.type == SDL_QUIT )
-            {
-                quit = 1;
-                apsis_quit();
-            }
-        }
+      int tick = SDL_GetTicks();
+     
+      if(tick < nTick)
+      {
+        SDL_Delay(nTick - tick);
+      }
 
+      nTick = tick + (1000 / FPS);
+      SDL_Event event;
+      printf("tick: %d\n", tick);
+      printf("next tick: %d\n", nTick);
+
+      while(SDL_PollEvent( &event ) != 0 )
+      {
+        switch(event.type)
+        {
+          case SDL_QUIT:
+            quit = 1;
+            apsis_quit();
+            break;
+          case SDL_MOUSEBUTTONDOWN:
+            render();
+        }
+      }
     }
     
     apsis_quit();
