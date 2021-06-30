@@ -33,11 +33,10 @@ int apsis_quit(void)
 }
 
 void draw_RotPhasor(SDL_Renderer *pRenderer, double originX, 
-                    double originY, double radius)  
+                    double originY, double radius, double radians)  
 {  
 
     /* convert to degrees */
-    double radians = 2.0;
     double angle = radians * 180 / PI;
     printf("Degrees: %f\n", angle);
     
@@ -47,7 +46,7 @@ void draw_RotPhasor(SDL_Renderer *pRenderer, double originX,
     double deltaY = originX + sin(angle)*radius;
     printf("deltaY: %f\n", deltaY);
    
-    printf("RADIUS: %f\n", radius);
+    printf("angle:  %f\n", angle);
     SDL_RenderDrawLine(pRenderer, originX, originY, deltaX, deltaY); 
 
  }
@@ -98,19 +97,16 @@ void draw_UnfilledCircle(SDL_Renderer *pRenderer, int centerx, int centery, int 
 
 int render(void)
 {
-  double r = 0.0; //temp
-  
-  while ( r <  31000 )
+  double i_angle = 0.0;
+  while (i_angle < 5000)
   {
-    r += 1.0;
-    
-    printf("Phasor radius actual: %f\n", r);
+    i_angle += 0.1;
 
     SDL_RenderClear(pRenderer);
     SDL_SetRenderDrawColor(pRenderer, 255, 255, 255, 255); //circle
     draw_UnfilledCircle(pRenderer, xCenter, yCenter, 160);
     SDL_SetRenderDrawColor(pRenderer, 255, 255, 255, 255); //phasor
-    draw_RotPhasor(pRenderer, xCenter, yCenter, r);
+    draw_RotPhasor(pRenderer, xCenter, yCenter, 160, i_angle);
     SDL_SetRenderDrawColor(pRenderer, 0, 0, 0, 255); //background
     SDL_RenderPresent(pRenderer);
   
