@@ -106,16 +106,19 @@ void draw_UnfilledCircle(SDL_Renderer *pRenderer, int centerx, int centery, int 
 
 int render(void)
 {
-  double i_angle = 0.0;
-  while (i_angle < 5000)
-  {
-    i_angle += 0.1;
+  double angle = 0.0;
+  int count = 0;
 
+  while (count < 5000)
+  {
+    double speed = 0.1;
+    double angle = speed * get_time();
+    
     SDL_RenderClear(pRenderer);
     SDL_SetRenderDrawColor(pRenderer, 255, 255, 255, 255); //circle
     draw_UnfilledCircle(pRenderer, xCenter, yCenter, 160);
     SDL_SetRenderDrawColor(pRenderer, 255, 255, 255, 255); //phasor
-    draw_RotPhasor(pRenderer, xCenter, yCenter, 160, i_angle);
+    draw_RotPhasor(pRenderer, xCenter, yCenter, 160, angle);
     SDL_SetRenderDrawColor(pRenderer, 0, 0, 0, 255); //background
     SDL_RenderPresent(pRenderer);
   
