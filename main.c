@@ -1,6 +1,7 @@
 #include <stdio.h>
 #include <math.h>
 #include <SDL2/SDL.h> 
+#include <time.h>
 #include "lib/apsisnw.h"
 
 SDL_Window *pWindow = NULL;
@@ -15,6 +16,14 @@ SDL_Texture *pTexture = NULL;
 int xCenter = WIDTH / 2; 
 int yCenter = HEIGHT / 2;
 int FPS = 30;
+
+/* Time */
+double get_time(void)
+{
+  struct timespec tp;
+  return clock_gettime(CLOCK_MONOTONIC, &tp) == 0 ? (double)tp.tv_sec + (double)tp.tv_nsec/1000000000.0 : 0.0; 
+}
+
 
 int apsis_quit(void)
 {
