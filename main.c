@@ -41,7 +41,7 @@ int apsis_quit(void)
     return 0;
 }
 
-void draw_RotPhasor(SDL_Renderer *pRenderer, double originX, 
+void draw_phasor(SDL_Renderer *pRenderer, double originX, 
                     double originY, double radius, double radians)  
 {  
 
@@ -61,7 +61,7 @@ void draw_RotPhasor(SDL_Renderer *pRenderer, double originX,
  }
 
 
-void draw_UnfilledCircle(SDL_Renderer *pRenderer, int centerx, int centery, int radius)
+void draw_unfilledcircle(SDL_Renderer *pRenderer, int centerx, int centery, int radius)
 {
   // Draws an empty circle with the given position and radius
 
@@ -106,7 +106,6 @@ void draw_UnfilledCircle(SDL_Renderer *pRenderer, int centerx, int centery, int 
 
 int render(void)
 {
-  double angle = 0.0;
   int count = 0;
 
   while (count < 500)
@@ -116,9 +115,9 @@ int render(void)
     
     SDL_RenderClear(pRenderer);
     SDL_SetRenderDrawColor(pRenderer, 255, 255, 255, 255); //circle
-    draw_UnfilledCircle(pRenderer, xCenter, yCenter, 160);
+    draw_unfilledcircle(pRenderer, xCenter, yCenter, 160);
     SDL_SetRenderDrawColor(pRenderer, 255, 255, 255, 255); //phasor
-    draw_RotPhasor(pRenderer, xCenter, yCenter, 160, angle);
+    draw_phasor(pRenderer, xCenter, yCenter, 160, angle);
     SDL_SetRenderDrawColor(pRenderer, 0, 0, 0, 255); //background
     SDL_RenderPresent(pRenderer);
   
