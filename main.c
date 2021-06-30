@@ -16,31 +16,42 @@ int xCenter = WIDTH / 2;
 int yCenter = HEIGHT / 2;
 int FPS = 30;
 
+int apsis_quit(void)
+{
+    SDL_DestroyWindow(pWindow);
+    pWindow = NULL;
+    printf("Window Destroyed.\n");
+    SDL_DestroyRenderer(pRenderer);
+    pRenderer = NULL;
+    printf("Renderer destroyed.\n");
+    SDL_DestroyTexture(pTexture);
+    pTexture = NULL;
+    printf("Texture destroyed.\n");
+    SDL_Quit();
+
+    return 0;
+}
+
 /* Drawing */
 
+/* spinRadius is the radius of the circle. */
 void draw_RotPhasor(SDL_Renderer *pRenderer, double originX, 
-                    double originY, double pointX, double pointY) 
+                    double originY, double radius)  
 {  
 
     /* convert to degrees */
-
-    double radians = 0.0;
-    double angle = radians * PI / 180;
+    double radians = 2.0;
+    double angle = radians * 180 / PI;
     printf("Degrees: %f\n", angle);
     
     /* rotate around origin point */
-    double deltaX = (cos(angle) * (pointX - originX)) - (sin(angle) * (pointY - originY)) + originX;
+    double deltaX = originY + cos(angle)*radius;
     printf("deltaX: %f\n", deltaX);    
-    double deltaY = (sin(angle) * (pointX - originX)) + (cos(angle) * (pointY - originY)) + originY;
+    double deltaY = originX + sin(angle)*radius;
     printf("deltaY: %f\n", deltaY);
-
-    pointX += deltaX;
-    pointY += deltaY;
-
-    printf("translate pX: %f\n", pointX);
-    printf("translate pY: %f\n", pointY);
-
-    SDL_RenderDrawLine(pRenderer, originX, originY, pointX, pointY); 
+   
+    printf("RADIUS: %f\n", radius);
+    SDL_RenderDrawLine(pRenderer, originX, originY, deltaX, deltaY); 
 
  }
 
@@ -90,25 +101,22 @@ void draw_UnfilledCircle(SDL_Renderer *pRenderer, int centerx, int centery, int 
 
 int render(void)
 {
-
-  int x = 320; //temp
-  int y = 100; //temp
+  double r = 0.0; //temp
   
-  while ( x > 500 )
+  while ( r <  31000 )
   {
-    x++;
-    y++;
-
-    printf("Phasor X actual: %d\n", x);
-    printf("Phasor Y actual: %d\n", y);
+    r += 1.0;
+    
+    printf("Phasor radius actual: %f\n", r);
 
     SDL_RenderClear(pRenderer);
     SDL_SetRenderDrawColor(pRenderer, 255, 255, 255, 255); //circle
     draw_UnfilledCircle(pRenderer, xCenter, yCenter, 160);
     SDL_SetRenderDrawColor(pRenderer, 255, 255, 255, 255); //phasor
-    draw_RotPhasor(pRenderer, xCenter, yCenter, x, y);
+    draw_RotPhasor(pRenderer, xCenter, yCenter, r);
     SDL_SetRenderDrawColor(pRenderer, 0, 0, 0, 255); //background
     SDL_RenderPresent(pRenderer);
+  
   }
 
   return 1;
@@ -118,18 +126,8 @@ int render(void)
 
 /* Setup */
 
-void 
-apsis_quit(void)
-{
-    SDL_DestroyWindow(pWindow);
-    pWindow = NULL;
-    SDL_DestroyRenderer(pRenderer);
-    pRenderer = NULL;
-    SDL_Quit();
-}
-
-int 
-init(void)
+ 
+int init(void)
 {
 
     if (SDL_Init(SDL_INIT_VIDEO) < 0)
@@ -183,36 +181,22 @@ int main(void)
         printf("Init failed.");
     }
     
-    int nTick = 0;
-
     while (!quit)
     {
-      int tick = SDL_GetTicks();
-     
-      if(tick < nTick)
-      {
-        SDL_Delay(nTick - tick);
-      }
-
-      nTick = tick + (1000 / FPS);
+      
       SDL_Event event;
-      printf("tick: %d\n", tick);
-      printf("next tick: %d\n", nTick);
 
       while(SDL_PollEvent( &event ) != 0 )
       {
-        switch(event.type)
+        if (event.type == SDL_QUIT)
         {
-          case SDL_QUIT:
-            quit = 1;
-            apsis_quit();
-            break;
-          case SDL_MOUSEBUTTONDOWN:
-            render();
+          quit = 1;
+          apsis_quit();
+          printf("Apsis quit.\n");
         }
       }
     }
     
-    apsis_quit();
+    printf("Apsis quit final.\n");
     return 0;
 }
