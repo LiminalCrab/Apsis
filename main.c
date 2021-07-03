@@ -15,14 +15,22 @@ SDL_Texture   *pTexture = NULL;
 int xCenter = WIDTH / 2; 
 int yCenter = HEIGHT / 2;
 int FPS = 30;
+int quit = 0;
 
-/* Time */
-double get_Time(void)
+typedef struct
 {
-  struct timespec tp;
-  return clock_gettime(CLOCK_MONOTONIC, &tp) == 0 ? (double)tp.tv_sec + (double)tp.tv_nsec/1000000000.0 : 0.0; 
-}
+    Uint8 r, g, b, a;
+} Color;
 
+Color create_Clr(Uint8 r, Uint8 g, Uint8 b, Uint8 a)
+{
+  Color clr;
+  clr.r = r;
+  clr.g = g;
+  clr.b = b;
+  clr.a = a;
+  return clr;
+}
 
 int apsis_Quit(void)
 {
@@ -40,28 +48,32 @@ int apsis_Quit(void)
     return 0;
 }
 
+/* Time */
+double get_Time(void)
+{
+  struct timespec tp;
+  return clock_gettime(CLOCK_MONOTONIC, &tp) == 0 ? (double)tp.tv_sec + (double)tp.tv_nsec/1000000000.0 : 0.0; 
+}
+
 /* 8x8 bitmap of pixel values*/
 
 unsigned char glyph[][8] = 
 {
-    {0x00, 0x00, 0x3c, 0x02, 0x3e, 0x42, 0x3e, 0x00}, /* A */
+    {0x00, 0x00, 0x3c, 0x02, 0x3e, 0x42, 0x3e, 0x00}, /* a */
 };
 
-void draw_Glyph(char *glyph)
+void draw_Glyph(SDL_Renderer *pRenderer, char* glyph, Color on_color, Color off_color)
 {
-    int x, y;
-    int set;
-    for (x=0; x < 8; x++)
-    {
-      for (y=0; y < 8; y++)
-      {
-        set = glyph[x] & 1 << y;
-        printf("x: %d\n", x);
-        printf("y: %d\n", y);
-        printf("set:%d\n", set);
-      }
-    }
+  for (int y = 0; y < 8; y++)
+    for(int x = 0; x < 8; x++)
+  {
+    if (glyph[y] & (1 << ( 7 - x)))
+      SDL_SetRenderDrawColor(pRenderer, on_color.r, on_color.g, on_color.b, on_color.a);
+    else
+      SDL_SetRenderDrawColor(pRenderer, off_color.r, off_color.g, off_color.b, off_color.a);
 
+    SDL_RenderDrawPoint(pRenderer, x, y);
+  }
 }
 
 void draw_Phasor(SDL_Renderer *pRenderer, double originX, 
@@ -125,9 +137,8 @@ void draw_UnfilledCircle(SDL_Renderer *pRenderer, int centerx, int centery, int 
 
 int render_UI(void)
 {
-  int count = 0;
 
-  while (count < 500)
+  while (!quit)
   {
     /* Metronome */
     double speed = 0.1;
@@ -135,21 +146,22 @@ int render_UI(void)
     
     SDL_RenderClear(pRenderer);
    
-    SDL_SetRenderDrawColor(pRenderer, 255, 255, 255, 255); /* Circle  */
+    SDL_SetRenderDrawColor(pRenderer, 0xFF, 0xFF, 0xFF, 255); /* Circle  */
     draw_UnfilledCircle(pRenderer, xCenter, yCenter, 160);
     
-    SDL_SetRenderDrawColor(pRenderer, 255, 255, 255, 255); /* Phasor  */ 
+    SDL_SetRenderDrawColor(pRenderer, 0xFF, 0xFF, 0xFF, 255); /* Phasor  */ 
     draw_Phasor(pRenderer, xCenter, yCenter, 160, angle);
     
-    SDL_SetRenderDrawColor(pRenderer, 0, 0, 0, 255); /* Background */
+    SDL_SetRenderDrawColor(pRenderer, 0x00, 0x00, 0x00, 255); /* Background */
     
     /*UI Text */
-    draw_Glyph("a");
-
+    Color on_clr = create_Clr(255, 255, 255, 255); // WHITE
+    Color off_clr = create_Clr(0, 0, 0, 255); // BLACK
+    draw_Glyph(pRenderer, *glyph, on_clr, off_clr);
     SDL_RenderPresent(pRenderer);
   
   }
-
+  quit = 1;
   return 1;
 }
 
@@ -177,7 +189,6 @@ int init(void)
     {
         printf("SDL_CreateWindow: %s\n", SDL_GetError());
     }
-
     pRenderer = SDL_CreateRenderer(pWindow, -1, 0);
 
     if (pRenderer == NULL)
@@ -204,9 +215,7 @@ int init(void)
 
 int main(void)
 {
-  int quit = 0;
-
-    
+   
     if (!init())
     {
         printf("Init failed.");
