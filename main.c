@@ -4,10 +4,9 @@
 #include <time.h>
 #include "lib/apsisnw.h"
 
-SDL_Window *pWindow = NULL;
-SDL_Renderer *pRenderer = NULL;
-SDL_Texture *pTexture = NULL;
-
+SDL_Window    *pWindow = NULL;
+SDL_Renderer  *pRenderer = NULL;
+SDL_Texture   *pTexture = NULL;
 
 #define WIDTH 640
 #define HEIGHT 480
@@ -18,14 +17,14 @@ int yCenter = HEIGHT / 2;
 int FPS = 30;
 
 /* Time */
-double get_time(void)
+double get_Time(void)
 {
   struct timespec tp;
   return clock_gettime(CLOCK_MONOTONIC, &tp) == 0 ? (double)tp.tv_sec + (double)tp.tv_nsec/1000000000.0 : 0.0; 
 }
 
 
-int apsis_quit(void)
+int apsis_Quit(void)
 {
     SDL_DestroyWindow(pWindow);
     pWindow = NULL;
@@ -41,7 +40,31 @@ int apsis_quit(void)
     return 0;
 }
 
-void draw_phasor(SDL_Renderer *pRenderer, double originX, 
+/* 8x8 bitmap of pixel values*/
+
+unsigned char glyph[][8] = 
+{
+    {0x00, 0x00, 0x3c, 0x02, 0x3e, 0x42, 0x3e, 0x00}, /* A */
+};
+
+void draw_Glyph(char *glyph)
+{
+    int x, y;
+    int set;
+    for (x=0; x < 8; x++)
+    {
+      for (y=0; y < 8; y++)
+      {
+        set = glyph[x] & 1 << y;
+        printf("x: %d\n", x);
+        printf("y: %d\n", y);
+        printf("set:%d\n", set);
+      }
+    }
+
+}
+
+void draw_Phasor(SDL_Renderer *pRenderer, double originX, 
                     double originY, double radius, double radians)  
 {  
 
@@ -51,9 +74,7 @@ void draw_phasor(SDL_Renderer *pRenderer, double originX,
     
     /* rotate around origin point */
     double deltaX = originX + cos(angle)*radius;
-    printf("deltaX: %f\n", deltaX);    
     double deltaY = originY + sin(angle)*radius;
-    printf("deltaY: %f\n", deltaY);
    
     printf("angle:  %f\n", angle);
     SDL_RenderDrawLine(pRenderer, originX, originY, deltaX, deltaY); 
@@ -61,9 +82,8 @@ void draw_phasor(SDL_Renderer *pRenderer, double originX,
  }
 
 
-void draw_unfilledcircle(SDL_Renderer *pRenderer, int centerx, int centery, int radius)
+void draw_UnfilledCircle(SDL_Renderer *pRenderer, int centerx, int centery, int radius)
 {
-  // Draws an empty circle with the given position and radius
 
   int diameter = (radius * 2);
 
@@ -76,7 +96,6 @@ void draw_unfilledcircle(SDL_Renderer *pRenderer, int centerx, int centery, int 
   while (x >= y)
   {
    
-    // Each renders an octant of the circle
     SDL_RenderDrawPoint(pRenderer, centerx + x, centery + y);
     SDL_RenderDrawPoint(pRenderer, centerx + x, centery - y);
     SDL_RenderDrawPoint(pRenderer, centerx - x, centery + y);
@@ -104,21 +123,29 @@ void draw_unfilledcircle(SDL_Renderer *pRenderer, int centerx, int centery, int 
 
 /* Render  */
 
-int render(void)
+int render_UI(void)
 {
   int count = 0;
 
   while (count < 500)
   {
+    /* Metronome */
     double speed = 0.1;
-    double angle = speed * get_time();
+    double angle = speed * get_Time();
     
     SDL_RenderClear(pRenderer);
-    SDL_SetRenderDrawColor(pRenderer, 255, 255, 255, 255); //circle
-    draw_unfilledcircle(pRenderer, xCenter, yCenter, 160);
-    SDL_SetRenderDrawColor(pRenderer, 255, 255, 255, 255); //phasor
-    draw_phasor(pRenderer, xCenter, yCenter, 160, angle);
-    SDL_SetRenderDrawColor(pRenderer, 0, 0, 0, 255); //background
+   
+    SDL_SetRenderDrawColor(pRenderer, 255, 255, 255, 255); /* Circle  */
+    draw_UnfilledCircle(pRenderer, xCenter, yCenter, 160);
+    
+    SDL_SetRenderDrawColor(pRenderer, 255, 255, 255, 255); /* Phasor  */ 
+    draw_Phasor(pRenderer, xCenter, yCenter, 160, angle);
+    
+    SDL_SetRenderDrawColor(pRenderer, 0, 0, 0, 255); /* Background */
+    
+    /*UI Text */
+    draw_Glyph("a");
+
     SDL_RenderPresent(pRenderer);
   
   }
@@ -169,7 +196,7 @@ int init(void)
         printf("SDL_CreateTexture:%s\n", SDL_GetError());
     }
 
-    render();
+    render_UI();
 
     return 1; 
 }
@@ -195,7 +222,7 @@ int main(void)
         if (event.type == SDL_QUIT)
         {
           quit = 1;
-          apsis_quit();
+          apsis_Quit();
           printf("Apsis quit.\n");
         }
       }
