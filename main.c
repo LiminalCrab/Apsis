@@ -7,14 +7,18 @@
 SDL_Window    *pWindow = NULL;
 SDL_Renderer  *pRenderer = NULL;
 SDL_Texture   *pTexture = NULL;
+SDL_Texture   *btuiTexture = NULL;
 
 #define WIDTH 640
 #define HEIGHT 480
 #define PI 3.14159265
 
+typedef unsigned char Uint8;
+typedef unsigned short Uint16;
+typedef unsigned int Uint32;
+
 int xCenter = WIDTH / 2; 
 int yCenter = HEIGHT / 2;
-int FPS = 30;
 int quit = 0;
 
 typedef struct
@@ -48,6 +52,11 @@ int apsis_Quit(void)
     return 0;
 }
 
+/* Routines  */
+void putpixel(Uint16 x, Uint16 y, Uint8 color)
+{
+}
+
 /* Time */
 double get_Time(void)
 {
@@ -62,7 +71,7 @@ unsigned char glyph[][8] =
     {0x00, 0x00, 0x3c, 0x02, 0x3e, 0x42, 0x3e, 0x00}, /* a */
 };
 
-void draw_Glyph(SDL_Renderer *pRenderer, char* glyph, Color on_color, Color off_color)
+void draw_Glyph(SDL_Renderer *pRenderer, unsigned char *glyph, Color on_color, Color off_color)
 {
   for (int y = 0; y < 8; y++)
     for(int x = 0; x < 8; x++)
@@ -155,9 +164,10 @@ int render_UI(void)
     SDL_SetRenderDrawColor(pRenderer, 0x00, 0x00, 0x00, 255); /* Background */
     
     /*UI Text */
-    Color on_clr = create_Clr(255, 255, 255, 255); // WHITE
-    Color off_clr = create_Clr(0, 0, 0, 255); // BLACK
+    Color on_clr = create_Clr(0xFF, 0xFF, 0xFF, 255); /* WHTIE */
+    Color off_clr = create_Clr(0x00, 0x00, 0x00, 255); /* BLACK */
     draw_Glyph(pRenderer, *glyph, on_clr, off_clr);
+
     SDL_RenderPresent(pRenderer);
   
   }
