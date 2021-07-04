@@ -1,130 +1,121 @@
+#include "lib/apsislib.h" /* Apsis lib */
+#include <SDL2/SDL.h>
+#include <stdlib.h>
 #include <stdio.h>
-#include <math.h>
-#include <SDL2/SDL.h> 
 #include <time.h>
-#include "lib/apsisnw.h"
 
-SDL_Window    *pWindow = NULL;
-SDL_Renderer  *pRenderer = NULL;
-SDL_Texture   *pTexture = NULL;
-SDL_Texture   *btuiTexture = NULL;
+SDL_Window *gWin = NULL;
+SDL_Renderer *gRen = NULL;
+SDL_Texture *gTxr = NULL;
 
-#define WIDTH 640
-#define HEIGHT 480
+#define HR 32
+#define VR 16
+#define PD 2
+#define SZ (HR * VR * 16)
+#define MAXSZ (HR * VR)
 #define PI 3.14159265
 
 typedef unsigned char Uint8;
 typedef unsigned short Uint16;
 typedef unsigned int Uint32;
 
-int xCenter = WIDTH / 2; 
-int yCenter = HEIGHT / 2;
-int quit = 0;
+int WIDTH = 32 * HR + PD * 8 * 2;
+int HEIGHT = 32 * (VR + 2) + PD * 8 * 2;
 
-typedef struct
-{
-    Uint8 r, g, b, a;
-} Color;
+Uint32 *px; /* Pixels */
 
-Color create_Clr(Uint8 r, Uint8 g, Uint8 b, Uint8 a)
-{
-  Color clr;
-  clr.r = r;
-  clr.g = g;
-  clr.b = b;
-  clr.a = a;
-  return clr;
-}
+Uint32 theme[] = {
+	0x000000,
+	0xFFFFFF,
+	0xFFFFFF,
+	0x000000,
+	0xFFFFFF};
 
-int apsis_Quit(void)
-{
-    SDL_DestroyWindow(pWindow);
-    pWindow = NULL;
-    printf("Window Destroyed.\n");
-    SDL_DestroyRenderer(pRenderer);
-    pRenderer = NULL;
-    printf("Renderer destroyed.\n");
-    SDL_DestroyTexture(pTexture);
-    pTexture = NULL;
-    printf("Texture destroyed.\n");
-    SDL_Quit();
-
-    return 0;
-}
-
-/* Routines  */
-void putpixel(Uint16 x, Uint16 y, Uint8 color)
-{
-}
-
-/* Time */
-double get_Time(void)
-{
-  struct timespec tp;
-  return clock_gettime(CLOCK_MONOTONIC, &tp) == 0 ? (double)tp.tv_sec + (double)tp.tv_nsec/1000000000.0 : 0.0; 
-}
-
-/* 8x8 bitmap of pixel values*/
-
-unsigned char glyph[][8] = 
+Uint8 glyph[][8] = 
 {
     {0x00, 0x00, 0x3c, 0x02, 0x3e, 0x42, 0x3e, 0x00}, /* a */
 };
 
-void draw_Glyph(SDL_Renderer *pRenderer, unsigned char *glyph, Color on_color, Color off_color)
-{
-  for (int y = 0; y < 8; y++)
-    for(int x = 0; x < 8; x++)
-  {
-    if (glyph[y] & (1 << ( 7 - x)))
-      SDL_SetRenderDrawColor(pRenderer, on_color.r, on_color.g, on_color.b, on_color.a);
-    else
-      SDL_SetRenderDrawColor(pRenderer, off_color.r, off_color.g, off_color.b, off_color.a);
+/* Routines  */
 
-    SDL_RenderDrawPoint(pRenderer, x, y);
-  }
+void quit(void)
+{
+    printf("Quiting.\n");
+    free(px);
+    SDL_DestroyTexture(gTxr);
+    gTxr = NULL;
+    SDL_DestroyRenderer(gRen);
+    gRen = NULL;
+    SDL_DestroyWindow(gWin);
+    gWin = NULL;
+    SDL_Quit();
+    exit(0);
 }
 
-void draw_Phasor(SDL_Renderer *pRenderer, double originX, 
-                    double originY, double radius, double radians)  
-{  
+double get_time(void)
+{
+  struct timespec tp;
+  return clock_gettime(CLOCK_MONOTONIC, &tp) == 0 ? (double)tp.tv_sec + (double)tp.tv_nsec/1000000000.0 : 0.0;
+
+}
+
+void setpx(Uint32 *dest, int x, int y, int clr)
+{
+  if (x >= 0 && x < WIDTH - 8 && y >= 0 && y < HEIGHT - 8)
+    dest[(y + PD * 8) * WIDTH + (x + PD * 8)] = theme[clr];
+}
+
+void draw_sprite(Uint32 *dest, int x, int y, Uint8 *glyph, int fg, int bg)
+{
+  int v, h;
+  for(v = 0; v < 8; v++)
+    for(h = 0; h < 8; h++)
+    {
+      int clr = (glyph[v] >> (7 - h)) & 0x1;
+      setpx(dest, x + h, y + v, clr == 1 ? fg : bg);
+    }
+
+}
+
+/* User Interface */
+
+void draw_phasor_line(SDL_Renderer *gRen, double ox,
+                    double oy, double radius, double radians)
+{
 
     /* convert to degrees */
     double angle = radians * 180 / PI;
     printf("Degrees: %f\n", angle);
-    
+
     /* rotate around origin point */
-    double deltaX = originX + cos(angle)*radius;
-    double deltaY = originY + sin(angle)*radius;
-   
+    double dx = ox + cos(angle)*radius;
+    double dy = oy + sin(angle)*radius;
+
     printf("angle:  %f\n", angle);
-    SDL_RenderDrawLine(pRenderer, originX, originY, deltaX, deltaY); 
+    SDL_RenderDrawLine(gRen, ox, oy, dx, dy);
 
  }
 
-
-void draw_UnfilledCircle(SDL_Renderer *pRenderer, int centerx, int centery, int radius)
+void draw_metronome_ring(SDL_Renderer *gRen, int cx, int cy, int radius)
 {
-
-  int diameter = (radius * 2);
+  int diam = (radius * 2);
 
   int x = radius - 1;
   int y = 0;
   int tx = 1;
   int ty = 1;
-  int error = tx - diameter;
+  int error = tx - diam;
 
   while (x >= y)
   {
-   
-    SDL_RenderDrawPoint(pRenderer, centerx + x, centery + y);
-    SDL_RenderDrawPoint(pRenderer, centerx + x, centery - y);
-    SDL_RenderDrawPoint(pRenderer, centerx - x, centery + y);
-    SDL_RenderDrawPoint(pRenderer, centerx - x, centery - y);
-    SDL_RenderDrawPoint(pRenderer, centerx + y, centery - x);
-    SDL_RenderDrawPoint(pRenderer, centerx + y, centery + x);
-    SDL_RenderDrawPoint(pRenderer, centerx - y, centery - x);
-    SDL_RenderDrawPoint(pRenderer, centerx - y, centery + x);
+    SDL_RenderDrawPoint(gRen, cx + x, cy + y);
+    SDL_RenderDrawPoint(gRen, cx + x, cy - y);
+    SDL_RenderDrawPoint(gRen, cx - x, cy + y);
+    SDL_RenderDrawPoint(gRen, cx - x, cy - y);
+    SDL_RenderDrawPoint(gRen, cx + y, cy - x);
+    SDL_RenderDrawPoint(gRen, cx + y, cy + x);
+    SDL_RenderDrawPoint(gRen, cx - y, cy - x);
+    SDL_RenderDrawPoint(gRen, cx - y, cy + x);
 
     if (error <= 0)
     {
@@ -133,120 +124,96 @@ void draw_UnfilledCircle(SDL_Renderer *pRenderer, int centerx, int centery, int 
       ty += 2;
     }
 
-    if (error > 0)
+    if( error > 0)
     {
       --x;
       tx += 2;
-      error += (tx - diameter);
+      error += (tx - diam);
+
     }
+
   }
 }
 
-/* Render  */
-
-int render_UI(void)
+int render_ui(void)
 {
+  int i;
+  int n = 0;
+  int BOTTOM = VR * 8 + 8;
+  int X_CENTER = WIDTH / 2;
+  int Y_CENTER = HEIGHT / 2;
 
-  while (!quit)
-  {
-    /* Metronome */
-    double speed = 0.1;
-    double angle = speed * get_Time();
-    
-    SDL_RenderClear(pRenderer);
-   
-    SDL_SetRenderDrawColor(pRenderer, 0xFF, 0xFF, 0xFF, 255); /* Circle  */
-    draw_UnfilledCircle(pRenderer, xCenter, yCenter, 160);
-    
-    SDL_SetRenderDrawColor(pRenderer, 0xFF, 0xFF, 0xFF, 255); /* Phasor  */ 
-    draw_Phasor(pRenderer, xCenter, yCenter, 160, angle);
-    
-    SDL_SetRenderDrawColor(pRenderer, 0x00, 0x00, 0x00, 255); /* Background */
-    
-    /*UI Text */
-    Color on_clr = create_Clr(0xFF, 0xFF, 0xFF, 255); /* WHTIE */
-    Color off_clr = create_Clr(0x00, 0x00, 0x00, 255); /* BLACK */
-    draw_Glyph(pRenderer, *glyph, on_clr, off_clr);
+  double speed = 0.1;
+  double angle = speed * get_time();
 
-    SDL_RenderPresent(pRenderer);
-  
-  }
-  quit = 1;
+  SDL_RenderClear(gRen);
+  SDL_SetRenderDrawColor(gRen, 0xFF, 0xFF, 0xFF, 255);
+  draw_metronome_ring(gRen, X_CENTER, Y_CENTER, 160);
+  SDL_SetRenderDrawColor(gRen, 0xFF, 0xFF, 0xFF, 255); /* Phasor  */
+  draw_phasor_line(gRen, X_CENTER, Y_CENTER, 160, angle);
+  SDL_RenderPresent(gRen);
+
   return 1;
 }
 
+/* SDL Initialization and events */
 
-
-/* Setup */
-
- 
 int init(void)
 {
+  int i, j;
+  if(SDL_Init(SDL_INIT_VIDEO) < 0)
+    return printf("Init has failed. %s\n", SDL_GetError());
+  gWin = SDL_CreateWindow("Apsis",
+        SDL_WINDOWPOS_UNDEFINED,
+        SDL_WINDOWPOS_UNDEFINED,
+        WIDTH,
+        HEIGHT,
+        SDL_WINDOW_SHOWN);
 
-    if (SDL_Init(SDL_INIT_VIDEO) < 0)
-    {
-        printf("SDL_Init: %s\n", SDL_GetError());
-    }
-    
-    pWindow = SDL_CreateWindow("Apsis", 
-                                SDL_WINDOWPOS_UNDEFINED, 
-                                SDL_WINDOWPOS_UNDEFINED, 
-                                WIDTH, 
-                                HEIGHT, 
-                                SDL_WINDOW_SHOWN);
-    
-    if (pWindow == NULL )
-    {
-        printf("SDL_CreateWindow: %s\n", SDL_GetError());
-    }
-    pRenderer = SDL_CreateRenderer(pWindow, -1, 0);
+  if(gWin == NULL)
+    return printf("Window error: %s\n", SDL_GetError());
 
-    if (pRenderer == NULL)
-    {
-        printf("SDL_CreateRenderer:%s\n", SDL_GetError());
-    }
+  gRen = SDL_CreateRenderer(gWin, -1, 0);
+  
+  if(gRen == NULL)
+    return printf("Renderer error: %s\n", SDL_GetError());
 
-    pTexture = SDL_CreateTexture(pRenderer, 
-                                SDL_PIXELFORMAT_ARGB8888, 
-                                SDL_TEXTUREACCESS_STATIC, 
-                                WIDTH, 
-                                HEIGHT);
-    
-    if (pTexture == NULL)
-    {
-        printf("SDL_CreateTexture:%s\n", SDL_GetError());
-    }
+  gTxr = SDL_CreateTexture(gRen,
+        SDL_PIXELFORMAT_ARGB8888,
+        SDL_TEXTUREACCESS_STATIC,
+        WIDTH,
+        HEIGHT);
 
-    render_UI();
+  if(gTxr == NULL)
+    return printf("Texture error: %s\n", SDL_GetError());
+  
+  px = (Uint32 *)malloc(WIDTH * HEIGHT * sizeof(Uint32));
+  
+  if(px == NULL)
+    return printf("Pixels failed to allocate memory.");
 
-    return 1; 
+  for (i = 0; i < HEIGHT; i++)
+    for(j = 0; j < WIDTH; j++)
+      px[i * WIDTH + j] = theme[0];
+  
+  render_ui();
+  return 1;
 }
-
 
 int main(void)
 {
-   
-    if (!init())
+  if(!init())
+    return printf("Main(): Init has failed: %s\n", SDL_GetError());
+  
+  while(1)
+  {
+    SDL_Event e;
+    while(SDL_PollEvent(&e) != 0)
     {
-        printf("Init failed.");
-    }
-    
-    while (!quit)
-    {
-      
-      SDL_Event event;
-
-      while(SDL_PollEvent( &event ) != 0 )
-      {
-        if (event.type == SDL_QUIT)
-        {
-          quit = 1;
-          apsis_Quit();
-          printf("Apsis quit.\n");
-        }
+      switch(e.type){
+      case SDL_QUIT: quit(); break;
       }
     }
-    
-    printf("Apsis quit final.\n");
-    return 0;
+  }
+
 }
