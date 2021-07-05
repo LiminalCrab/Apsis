@@ -21,7 +21,7 @@ typedef unsigned int Uint32;
 
 int WIDTH = 32 * HR + PD * 8 * 2;
 int HEIGHT = 32 * (VR + 2) + PD * 8 * 2;
-char *fd_font;
+
 int ql = 0; /* Quit loop */
 
 /* Routines  */
@@ -31,6 +31,8 @@ void quit(void)
     printf("Quiting.\n");
     SDL_DestroyTexture(gTxr);
     gTxr = NULL;
+    SDL_DestroyTexture(bpmtxt_Txr);
+    bpmtxt_Txr = NULL;
     SDL_DestroyRenderer(gRen);
     gRen = NULL;
     SDL_DestroyWindow(gWin);
@@ -135,17 +137,26 @@ int render_ui(void)
 
   /*Phasor angle and speed */
   double speed = 0.1;
-  double angle = speed * get_time();
+  double angle = speed * get_time(); 
 
-  /* Font type of text */
-  TTF_Font *font = TTF_OpenFont(fd_font, 24);
+  TTF_Init();
+  TTF_Font* font = TTF_OpenFont("Sans.tff", 24);
+  if(font == NULL)
+    return printf("Font: %s\n", SDL_GetError());
+
   SDL_RenderClear(gRen);
+
   SDL_SetRenderDrawColor(gRen, 0xFF, 0xFF, 0xFF, 255);
   draw_metronome_ring(gRen, X_CENTER, Y_CENTER, 160);
+  
   SDL_SetRenderDrawColor(gRen, 0xFF, 0xFF, 0xFF, 255); /* Phasor  */
   draw_phasor_line(gRen, X_CENTER, Y_CENTER, 160, angle);
+  
+  /* Draw BPM text */
   SDL_SetRenderDrawColor(gRen, 0xFF, 0xFF, 0xFF, 255);
-  draw_txt(gRen, 200, 200, "Word", font, &bpmtxt_Txr, &bpmtxt_Rect);
+  draw_txt(gRen, 200, 200, "BPM:", font, &bpmtxt_Txr, &bpmtxt_Rect);
+  SDL_RenderCopy(gRen, bpmtxt_Txr, NULL, &bpmtxt_Rect);
+
   SDL_SetRenderDrawColor(gRen, 0x00, 0x00, 0x00, 255); /* Background */
   SDL_RenderPresent(gRen);
   return 0;
@@ -180,7 +191,7 @@ int init(void)
 
   if(gTxr == NULL)
     return printf("Texture error: %s\n", SDL_GetError());
-  
+
   return 1;
 }
 
