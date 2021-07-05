@@ -1,18 +1,18 @@
-#include "lib/apsislib.h" /* Apsis lib */
 #include <SDL2/SDL.h>
+#include <SDL2/SDL_ttf.h>
 #include <stdlib.h>
 #include <stdio.h>
 #include <time.h>
 
-SDL_Window *gWin = NULL;
-SDL_Renderer *gRen = NULL;
-SDL_Texture *gTxr = NULL;
+SDL_Window    *gWin = NULL;
+SDL_Renderer  *gRen = NULL;
+SDL_Texture   *gTxr, *bpmtxt_Txr = NULL;
+
+SDL_Rect       bpmtxt_Rect;
 
 #define HR 32
 #define VR 16
 #define PD 2
-#define SZ (HR * VR * 16)
-#define MAXSZ (HR * VR)
 #define PI 3.14159265
 
 typedef unsigned char Uint8;
@@ -21,6 +21,7 @@ typedef unsigned int Uint32;
 
 int WIDTH = 32 * HR + PD * 8 * 2;
 int HEIGHT = 32 * (VR + 2) + PD * 8 * 2;
+char *fd_font;
 int ql = 0; /* Quit loop */
 
 /* Routines  */
@@ -38,6 +39,7 @@ void quit(void)
     exit(0);
 }
 
+/* Get time in seconds*/
 double get_time(void)
 {
   struct timespec tp;
@@ -46,8 +48,25 @@ double get_time(void)
 
 }
 
-
 /* User Interface */
+void draw_txt(SDL_Renderer *gRen, int x, int y, 
+              char *txt, TTF_Font *font, 
+              SDL_Texture **txtTxr, SDL_Rect *txtRect)
+{
+  int txt_w;
+  int txt_h;
+  SDL_Surface  *txtSurf;
+  SDL_Color     txt_clr = {0xFF, 0xFF, 0xFF, 0};
+  
+  txtSurf = TTF_RenderText_Solid(font, txt, txt_clr);
+  *txtTxr = SDL_CreateTextureFromSurface(gRen, txtSurf);
+  txt_w = txtSurf->w;
+  txt_h = txtSurf->h;
+  txtRect->x = x;
+  txtRect->y = y;
+  txtRect->w = txt_w;
+  txtRect->h = txt_h;
+}
 
 /* rotating phasor line 
  * args: renderer, origin x, origin y, radius, and radians*/
@@ -110,17 +129,23 @@ void draw_metronome_ring(SDL_Renderer *gRen, int cx,
 
 int render_ui(void)
 {
+  /* Screen width and height centered */
   int X_CENTER = WIDTH / 2;
   int Y_CENTER = HEIGHT / 2;
 
+  /*Phasor angle and speed */
   double speed = 0.1;
   double angle = speed * get_time();
 
+  /* Font type of text */
+  TTF_Font *font = TTF_OpenFont(fd_font, 24);
   SDL_RenderClear(gRen);
   SDL_SetRenderDrawColor(gRen, 0xFF, 0xFF, 0xFF, 255);
   draw_metronome_ring(gRen, X_CENTER, Y_CENTER, 160);
   SDL_SetRenderDrawColor(gRen, 0xFF, 0xFF, 0xFF, 255); /* Phasor  */
   draw_phasor_line(gRen, X_CENTER, Y_CENTER, 160, angle);
+  SDL_SetRenderDrawColor(gRen, 0xFF, 0xFF, 0xFF, 255);
+  draw_txt(gRen, 200, 200, "Word", font, &bpmtxt_Txr, &bpmtxt_Rect);
   SDL_SetRenderDrawColor(gRen, 0x00, 0x00, 0x00, 255); /* Background */
   SDL_RenderPresent(gRen);
   return 0;
