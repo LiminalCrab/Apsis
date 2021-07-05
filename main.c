@@ -21,6 +21,7 @@ typedef unsigned int Uint32;
 
 int WIDTH = 32 * HR + PD * 8 * 2;
 int HEIGHT = 32 * (VR + 2) + PD * 8 * 2;
+int ql = 0; /* Quit loop */
 
 /* Routines  */
 
@@ -120,16 +121,15 @@ int render_ui(void)
   draw_metronome_ring(gRen, X_CENTER, Y_CENTER, 160);
   SDL_SetRenderDrawColor(gRen, 0xFF, 0xFF, 0xFF, 255); /* Phasor  */
   draw_phasor_line(gRen, X_CENTER, Y_CENTER, 160, angle);
+  SDL_SetRenderDrawColor(gRen, 0x00, 0x00, 0x00, 255); /* Background */
   SDL_RenderPresent(gRen);
-
-  return 1;
+  return 0;
 }
 
 /* SDL Initialization and events */
 
 int init(void)
 {
-  int i, j;
   if(SDL_Init(SDL_INIT_VIDEO) < 0)
     return printf("Init has failed. %s\n", SDL_GetError());
   gWin = SDL_CreateWindow("Apsis",
@@ -156,24 +156,31 @@ int init(void)
   if(gTxr == NULL)
     return printf("Texture error: %s\n", SDL_GetError());
   
-  render_ui();
   return 1;
 }
 
 int main(void)
 {
+
   if(!init())
     return printf("Main(): Init has failed: %s\n", SDL_GetError());
+
+  /* Main loop */
   
-  while(1)
+  while(!ql)
   {
     SDL_Event e;
     while(SDL_PollEvent(&e) != 0)
     {
       switch(e.type){
-      case SDL_QUIT: quit(); break;
+      case SDL_QUIT:
+        quit();
+        ql = 1;
+        break;
       }
     }
+    render_ui();
   }
-
+  quit();
+  return 0;
 }
