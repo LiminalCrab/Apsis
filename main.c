@@ -9,7 +9,7 @@ SDL_Renderer  *gRen = NULL;
 SDL_Texture   *gTxr, *bpmtxt_Txr = NULL;
 
 SDL_Rect       bpmtxt_Rect;
-
+TTF_Font      *font = NULL;
 #define HR 32
 #define VR 16
 #define PD 2
@@ -138,13 +138,13 @@ int render_ui(void)
   /*Phasor angle and speed */
   double speed = 0.1;
   double angle = speed * get_time(); 
+  
+  if(!font)
+  {
+    font = TTF_OpenFont("/home/liminalcrab/Documents/Projects/Apsis/FreeSans.ttf", 12);
+  }
 
-  TTF_Init();
-  TTF_Font* font = TTF_OpenFont("Sans.tff", 24);
-  if(font == NULL)
-    return printf("Font: %s\n", SDL_GetError());
-
-  SDL_RenderClear(gRen);
+   SDL_RenderClear(gRen);
 
   SDL_SetRenderDrawColor(gRen, 0xFF, 0xFF, 0xFF, 255);
   draw_metronome_ring(gRen, X_CENTER, Y_CENTER, 160);
@@ -159,6 +159,7 @@ int render_ui(void)
 
   SDL_SetRenderDrawColor(gRen, 0x00, 0x00, 0x00, 255); /* Background */
   SDL_RenderPresent(gRen);
+  
   return 0;
 }
 
@@ -191,6 +192,8 @@ int init(void)
 
   if(gTxr == NULL)
     return printf("Texture error: %s\n", SDL_GetError());
+  
+  TTF_Init();
 
   return 1;
 }
