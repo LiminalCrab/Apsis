@@ -27,8 +27,6 @@ int HEIGHT = 32 * (VR + 2) + PD * 8 * 2;
 
 int ql = 0; /* Quit loop */
 
-char *getcwd(char *buffer, size_t size);
-
 /* Routines  */
 
 /* Exit the program */
@@ -45,6 +43,11 @@ void quit(void)
     gWin = NULL;
     SDL_Quit();
     exit(0);
+}
+
+int clmp(int val, int min, int max)
+{
+	return (val >= min) ? (val <= max) ? val : max : min;
 }
 
 /* Get time in seconds*/
@@ -68,6 +71,12 @@ void draw_txt(SDL_Renderer *gRen, int x, int y,
   
   txtSurf = TTF_RenderText_Solid(font, txt, txt_clr);
   *txtTxr = SDL_CreateTextureFromSurface(gRen, txtSurf);
+
+  if(txtTxr == NULL)
+  {
+      printf("Text Texture: %19s\n", &txtTxr);
+  }
+
   txt_w = txtSurf->w;
   txt_h = txtSurf->h;
   txtRect->x = x;
@@ -140,22 +149,13 @@ int render_ui(void)
   /* Screen width and height centered */
   int X_CENTER = WIDTH / 2;
   int Y_CENTER = HEIGHT / 2;
+  
 
   /*Phasor angle and speed */
   double speed = 0.1;
   double angle = speed * get_time(); 
   
-  if(!font)
-  {
-    font = TTF_OpenFont("/home/liminalcrab/Documents/Projects/Apsis/fonts/FreeSans.ttf", 12);
-    if (font == NULL)
-    {
-      printf("Font: %s\n", TTF_GetError());
-      quit();
-    }
-  }
-
-   SDL_RenderClear(gRen);
+  SDL_RenderClear(gRen);
 
   SDL_SetRenderDrawColor(gRen, 0xFF, 0xFF, 0xFF, 255);
   draw_metronome_ring(gRen, X_CENTER, Y_CENTER, 160);
@@ -165,7 +165,14 @@ int render_ui(void)
   
   /* Draw BPM text */
   SDL_SetRenderDrawColor(gRen, 0xFF, 0xFF, 0xFF, 255);
-  draw_txt(gRen, 200, 200, "BPM:", font, &bpmtxt_Txr, &bpmtxt_Rect);
+  
+  /*draws text "BPM"
+   *args: renderer, x coord, y coord, text, texture, rectangle*/
+  draw_txt(gRen, 100, 550, "BPM:", font, &bpmtxt_Txr, &bpmtxt_Rect);
+  SDL_RenderCopy(gRen, bpmtxt_Txr, NULL, &bpmtxt_Rect);
+  
+  /* draws text that reads "00" */
+  draw_txt(gRen, 130, 550, "00", font, &bpmtxt_Txr, &bpmtxt_Rect);
   SDL_RenderCopy(gRen, bpmtxt_Txr, NULL, &bpmtxt_Rect);
 
   SDL_SetRenderDrawColor(gRen, 0x00, 0x00, 0x00, 255); /* Background */
@@ -206,11 +213,21 @@ int init(void)
   
   TTF_Init();
 
+  if(!font)
+   {
+     font = TTF_OpenFont("/home/liminalcrab/Documents/Projects/Apsis/fonts/FreeSans.ttf", 12);
+    if (font == NULL)
+     {
+      printf("Font: %s\n", TTF_GetError());
+      quit();
+    }
+  }
   return 1;
 }
 
 int main(void)
 {
+  Uint8 tick = 0;
 
   if(!init())
     return printf("Main(): Init has failed: %s\n", SDL_GetError());
@@ -230,6 +247,22 @@ int main(void)
       }
     }
     render_ui();
+
+    double elapsed, start = SDL_GetPerformanceCounter();
+    if(!ql)
+    {
+      if(tick > 7)
+      {
+        gRen = SDL_CreateRenderer(gWin, -1, 0);
+        tick = 0;
+      }
+      else 
+      {
+        tick++;
+      }
+    }
+    elapsed = (SDL_GetPerformanceCounter() - start) / (double)SDL_GetPerformanceFrequency() * 1000.0f;
+    SDL_Delay(clmp(16.666f - elapsed, 0, 1000));
   }
   quit();
   return 0;
