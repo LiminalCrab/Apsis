@@ -1,6 +1,8 @@
 #include <SDL2/SDL.h>
 #include <SDL2/SDL_ttf.h>
 #include <stdlib.h>
+#include <unistd.h>
+#include <limits.h>
 #include <stdio.h>
 #include <time.h>
 
@@ -10,6 +12,7 @@ SDL_Texture   *gTxr, *bpmtxt_Txr = NULL;
 
 SDL_Rect       bpmtxt_Rect;
 TTF_Font      *font = NULL;
+
 #define HR 32
 #define VR 16
 #define PD 2
@@ -24,8 +27,11 @@ int HEIGHT = 32 * (VR + 2) + PD * 8 * 2;
 
 int ql = 0; /* Quit loop */
 
+char *getcwd(char *buffer, size_t size);
+
 /* Routines  */
 
+/* Exit the program */
 void quit(void)
 {
     printf("Quiting.\n");
@@ -141,7 +147,12 @@ int render_ui(void)
   
   if(!font)
   {
-    font = TTF_OpenFont("/home/liminalcrab/Documents/Projects/Apsis/FreeSans.ttf", 12);
+    font = TTF_OpenFont("/home/liminalcrab/Documents/Projects/Apsis/fonts/FreeSans.ttf", 12);
+    if (font == NULL)
+    {
+      printf("Font: %s\n", TTF_GetError());
+      quit();
+    }
   }
 
    SDL_RenderClear(gRen);
