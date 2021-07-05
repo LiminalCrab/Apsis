@@ -9,6 +9,8 @@
 SDL_Window    *gWin = NULL;
 SDL_Renderer  *gRen = NULL;
 SDL_Texture   *gTxr, *bpmtxt_Txr = NULL;
+SDL_Surface   *txtSurf;
+SDL_Color     txt_clr = {0xFF, 0xFF, 0xFF, 0};
 
 SDL_Rect       bpmtxt_Rect;
 TTF_Font      *font = NULL;
@@ -45,6 +47,7 @@ void quit(void)
     exit(0);
 }
 
+/* clamp values to a specific range */
 int clmp(int val, int min, int max)
 {
 	return (val >= min) ? (val <= max) ? val : max : min;
@@ -66,16 +69,9 @@ void draw_txt(SDL_Renderer *gRen, int x, int y,
 {
   int txt_w;
   int txt_h;
-  SDL_Surface  *txtSurf;
-  SDL_Color     txt_clr = {0xFF, 0xFF, 0xFF, 0};
-  
+
   txtSurf = TTF_RenderText_Solid(font, txt, txt_clr);
   *txtTxr = SDL_CreateTextureFromSurface(gRen, txtSurf);
-
-  if(txtTxr == NULL)
-  {
-      printf("Text Texture: %19s\n", &txtTxr);
-  }
 
   txt_w = txtSurf->w;
   txt_h = txtSurf->h;
@@ -159,10 +155,9 @@ int render_ui(void)
 
   SDL_SetRenderDrawColor(gRen, 0xFF, 0xFF, 0xFF, 255);
   draw_metronome_ring(gRen, X_CENTER, Y_CENTER, 160);
-  
+
   SDL_SetRenderDrawColor(gRen, 0xFF, 0xFF, 0xFF, 255); /* Phasor  */
   draw_phasor_line(gRen, X_CENTER, Y_CENTER, 160, angle);
-  
   /* Draw BPM text */
   SDL_SetRenderDrawColor(gRen, 0xFF, 0xFF, 0xFF, 255);
   
@@ -208,9 +203,6 @@ int init(void)
         WIDTH,
         HEIGHT);
 
-  if(gTxr == NULL)
-    return printf("Texture error: %s\n", SDL_GetError());
-  
   TTF_Init();
 
   if(!font)
@@ -227,7 +219,6 @@ int init(void)
 
 int main(void)
 {
-  Uint8 tick = 0;
 
   if(!init())
     return printf("Main(): Init has failed: %s\n", SDL_GetError());
