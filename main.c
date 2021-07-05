@@ -22,26 +22,11 @@ typedef unsigned int Uint32;
 int WIDTH = 32 * HR + PD * 8 * 2;
 int HEIGHT = 32 * (VR + 2) + PD * 8 * 2;
 
-Uint32 *px; /* Pixels */
-
-Uint32 theme[] = {
-	0x000000,
-	0xFFFFFF,
-	0xFFFFFF,
-	0x000000,
-	0xFFFFFF};
-
-Uint8 glyph[][8] = 
-{
-    {0x00, 0x00, 0x3c, 0x02, 0x3e, 0x42, 0x3e, 0x00}, /* a */
-};
-
 /* Routines  */
 
 void quit(void)
 {
     printf("Quiting.\n");
-    free(px);
     SDL_DestroyTexture(gTxr);
     gTxr = NULL;
     SDL_DestroyRenderer(gRen);
@@ -55,48 +40,35 @@ void quit(void)
 double get_time(void)
 {
   struct timespec tp;
-  return clock_gettime(CLOCK_MONOTONIC, &tp) == 0 ? (double)tp.tv_sec + (double)tp.tv_nsec/1000000000.0 : 0.0;
+  return clock_gettime(CLOCK_MONOTONIC, &tp) == 0 ? (double)tp.tv_sec \
+    + (double)tp.tv_nsec/1000000000.0 : 0.0;
 
 }
 
-void setpx(Uint32 *dest, int x, int y, int clr)
-{
-  if (x >= 0 && x < WIDTH - 8 && y >= 0 && y < HEIGHT - 8)
-    dest[(y + PD * 8) * WIDTH + (x + PD * 8)] = theme[clr];
-}
-
-void draw_sprite(Uint32 *dest, int x, int y, Uint8 *glyph, int fg, int bg)
-{
-  int v, h;
-  for(v = 0; v < 8; v++)
-    for(h = 0; h < 8; h++)
-    {
-      int clr = (glyph[v] >> (7 - h)) & 0x1;
-      setpx(dest, x + h, y + v, clr == 1 ? fg : bg);
-    }
-
-}
 
 /* User Interface */
 
+/* rotating phasor line 
+ * args: renderer, origin x, origin y, radius, and radians*/
 void draw_phasor_line(SDL_Renderer *gRen, double ox,
                     double oy, double radius, double radians)
 {
 
     /* convert to degrees */
     double angle = radians * 180 / PI;
-    printf("Degrees: %f\n", angle);
 
     /* rotate around origin point */
     double dx = ox + cos(angle)*radius;
     double dy = oy + sin(angle)*radius;
 
-    printf("angle:  %f\n", angle);
     SDL_RenderDrawLine(gRen, ox, oy, dx, dy);
 
  }
 
-void draw_metronome_ring(SDL_Renderer *gRen, int cx, int cy, int radius)
+/* ring of the metronome, radius 160 by default.
+ * args: renderer, center x, center y, radius. */
+void draw_metronome_ring(SDL_Renderer *gRen, int cx, 
+                      int cy, int radius)
 {
   int diam = (radius * 2);
 
@@ -137,9 +109,6 @@ void draw_metronome_ring(SDL_Renderer *gRen, int cx, int cy, int radius)
 
 int render_ui(void)
 {
-  int i;
-  int n = 0;
-  int BOTTOM = VR * 8 + 8;
   int X_CENTER = WIDTH / 2;
   int Y_CENTER = HEIGHT / 2;
 
@@ -186,15 +155,6 @@ int init(void)
 
   if(gTxr == NULL)
     return printf("Texture error: %s\n", SDL_GetError());
-  
-  px = (Uint32 *)malloc(WIDTH * HEIGHT * sizeof(Uint32));
-  
-  if(px == NULL)
-    return printf("Pixels failed to allocate memory.");
-
-  for (i = 0; i < HEIGHT; i++)
-    for(j = 0; j < WIDTH; j++)
-      px[i * WIDTH + j] = theme[0];
   
   render_ui();
   return 1;
