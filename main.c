@@ -233,10 +233,10 @@ int main(void)
     return printf("Main(): Init has failed: %s\n", SDL_GetError());
 
   /* Main loop */
-  
   while(!ql)
   {
     SDL_Event e;
+    double elapsed, start = SDL_GetPerformanceCounter();
     while(SDL_PollEvent(&e) != 0)
     {
       switch(e.type){
@@ -247,23 +247,10 @@ int main(void)
       }
     }
     render_ui();
-
-    double elapsed, start = SDL_GetPerformanceCounter();
-    if(!ql)
-    {
-      if(tick > 7)
-      {
-        gRen = SDL_CreateRenderer(gWin, -1, 0);
-        tick = 0;
-      }
-      else 
-      {
-        tick++;
-      }
-    }
     elapsed = (SDL_GetPerformanceCounter() - start) / (double)SDL_GetPerformanceFrequency() * 1000.0f;
     SDL_Delay(clmp(16.666f - elapsed, 0, 1000));
   }
+
   quit();
   return 0;
 }
