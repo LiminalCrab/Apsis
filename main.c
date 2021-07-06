@@ -108,12 +108,14 @@ double get_time(void)
 
 int get_symbol(int x, int y, char sym)
 {
-    if(sym >= 'A' && sym <= 'Y')
-        return sym - 'A' + 14;
     if(sym >= '0' && sym <= '9')
         return sym - '0';
+    if(sym >= 'A' && sym <= 'Y')
+        return sym - 'A' + 12;
     if(sym == ':')
-        return 59; 
+        return 11;
+
+    return 26;
 
 }
 /* Draw text*/
