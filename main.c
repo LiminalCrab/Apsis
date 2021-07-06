@@ -193,15 +193,18 @@ int render_ui(void)
   double angle = speed * get_time(); 
   
   SDL_RenderClear(gRen);
-
+    
+  /* Ring */
   SDL_SetRenderDrawColor(gRen, 0xFF, 0xFF, 0xFF, 255);
   draw_metronome_ring(gRen, X_CENTER, Y_CENTER, 160);
-
-  SDL_SetRenderDrawColor(gRen, 0xFF, 0xFF, 0xFF, 255); /* Phasor  */
+  
+  /* Phasor */
+  SDL_SetRenderDrawColor(gRen, 0xFF, 0xFF, 0xFF, 255);
   draw_phasor_line(gRen, X_CENTER, Y_CENTER, 160, angle);
+
   SDL_SetRenderDrawColor(gRen, 0x00, 0x00, 0x00, 255);
   
-  /* Draw BPM text */
+  /* BPM */
   Clr on = set_clr(0xFF, 0xFF, 0xFF, 255);
   Clr off = set_clr(0x00, 0x00, 0x00, 255);
   draw_symbol(gRen, 100, 550, symbol[12], on, off);
@@ -211,7 +214,9 @@ int render_ui(void)
   draw_symbol(gRen, 132, 550, symbol[0], on, off);
   draw_symbol(gRen, 140, 550, symbol[0], on, off);
   draw_symbol(gRen, 148, 550, symbol[0], on, off);
-  
+
+  /* Latency */
+
   SDL_RenderPresent(gRen);
   SDL_DestroyTexture(gTxr);
   gTxr = NULL;
