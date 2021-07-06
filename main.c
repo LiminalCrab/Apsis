@@ -1,5 +1,4 @@
 #include <SDL2/SDL.h>
-#include <SDL2/SDL_ttf.h>
 #include <stdlib.h>
 #include <unistd.h>
 #include <limits.h>
@@ -8,12 +7,7 @@
 
 SDL_Window    *gWin = NULL;
 SDL_Renderer  *gRen = NULL;
-SDL_Texture   *gTxr, *bpmtxt_Txr = NULL;
-SDL_Surface   *txtSurf;
-SDL_Color     txt_clr = {0xFF, 0xFF, 0xFF, 0};
-
-SDL_Rect       bpmtxt_Rect;
-TTF_Font      *font = NULL;
+SDL_Texture   *gTxr = NULL;
 
 #define HR 32
 #define VR 16
@@ -29,6 +23,27 @@ int HEIGHT = 32 * (VR + 2) + PD * 8 * 2;
 
 int ql = 0; /* Quit loop */
 
+typedef struct Clr
+{
+ Uint8 r, g, b, a;
+} Clr;
+
+Clr set_clr(Uint8 r, Uint8 g, Uint8 b, Uint8 a)
+{
+  Clr clr;
+
+  clr.r = r;
+  clr.g = g;
+  clr.b = b;
+  clr.a = a;
+
+  return clr;
+}
+
+Uint8 symbol[][8] = {
+  { 0x00, 0x00, 0x1E, 0x30, 0x3E, 0x33, 0x6E, 0x00 }, /* a */
+};
+
 /* Routines  */
 
 /* Exit the program */
@@ -37,8 +52,6 @@ void quit(void)
     printf("Quiting.\n");
     SDL_DestroyTexture(gTxr);
     gTxr = NULL;
-    SDL_DestroyTexture(bpmtxt_Txr);
-    bpmtxt_Txr = NULL;
     SDL_DestroyRenderer(gRen);
     gRen = NULL;
     SDL_DestroyWindow(gWin);
@@ -63,24 +76,23 @@ double get_time(void)
 }
 
 /* User Interface */
-void draw_txt(SDL_Renderer *gRen, int x, int y, 
-              char *txt, TTF_Font *font, 
-              SDL_Texture **txtTxr, SDL_Rect *txtRect)
+
+/* Draw text*/
+void draw_symbol(SDL_Renderer *gRen, char *symbol, Clr on, Clr off)
 {
-  int txt_w;
-  int txt_h;
+  for(int y = 0; y < 8; y++)
+  {
+    for(int x = 0; x < 8; x++)
+    {
+      if(symbol[y] & (1 << (7 - x )))
+        SDL_SetRenderDrawColor(gRen, on.r, on.g, on.b, on.a);
+      else
+        SDL_SetRenderDrawColor(gRen, off.r, off.g, off.b, off.a);
 
-  txtSurf = TTF_RenderText_Solid(font, txt, txt_clr);
-  *txtTxr = SDL_CreateTextureFromSurface(gRen, txtSurf);
-
-  txt_w = txtSurf->w;
-  txt_h = txtSurf->h;
-  txtRect->x = x;
-  txtRect->y = y;
-  txtRect->w = txt_w;
-  txtRect->h = txt_h;
+      SDL_RenderDrawPoint(gRen, x, y);
+    }
+  }
 }
-
 /* rotating phasor line 
  * args: renderer, origin x, origin y, radius, and radians*/
 void draw_phasor_line(SDL_Renderer *gRen, double ox,
@@ -159,20 +171,16 @@ int render_ui(void)
   SDL_SetRenderDrawColor(gRen, 0xFF, 0xFF, 0xFF, 255); /* Phasor  */
   draw_phasor_line(gRen, X_CENTER, Y_CENTER, 160, angle);
   /* Draw BPM text */
-  SDL_SetRenderDrawColor(gRen, 0xFF, 0xFF, 0xFF, 255);
-  
-  /*draws text "BPM"
-   *args: renderer, x coord, y coord, text, texture, rectangle*/
-  draw_txt(gRen, 100, 550, "BPM:", font, &bpmtxt_Txr, &bpmtxt_Rect);
-  SDL_RenderCopy(gRen, bpmtxt_Txr, NULL, &bpmtxt_Rect);
-  
-  /* draws text that reads "00" */
-  draw_txt(gRen, 130, 550, "00", font, &bpmtxt_Txr, &bpmtxt_Rect);
-  SDL_RenderCopy(gRen, bpmtxt_Txr, NULL, &bpmtxt_Rect);
+  Clr on = set_clr(0xFF, 0xFF, 0xFF, 255);
+  Clr off = set_clr(0x00, 0x00, 0x00, 255);
+  draw_symbol(gRen, *symbol, on, off);
 
   SDL_SetRenderDrawColor(gRen, 0x00, 0x00, 0x00, 255); /* Background */
   SDL_RenderPresent(gRen);
   
+  SDL_DestroyTexture(gTxr);
+  gTxr = NULL;
+
   return 0;
 }
 
@@ -203,17 +211,6 @@ int init(void)
         WIDTH,
         HEIGHT);
 
-  TTF_Init();
-
-  if(!font)
-   {
-     font = TTF_OpenFont("/home/liminalcrab/Documents/Projects/Apsis/fonts/FreeSans.ttf", 12);
-    if (font == NULL)
-     {
-      printf("Font: %s\n", TTF_GetError());
-      quit();
-    }
-  }
   return 1;
 }
 
