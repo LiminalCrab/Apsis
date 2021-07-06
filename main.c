@@ -232,17 +232,18 @@ int render_ui(void)
   draw_symbol(gRen, 148, 550, symbol[0], on, off);
 
   /* Phase offset */
-  draw_symbol(gRen, 200, 550, symbol[21], on, off);
-  draw_symbol(gRen, 208, 550, symbol[10], on, off);  
-  draw_symbol(gRen, 216, 550, symbol[29], on, off);  
-  draw_symbol(gRen, 224, 550, symbol[14], on, off);
-  draw_symbol(gRen, 232, 550, symbol[23], on, off);  
-  draw_symbol(gRen, 240, 550, symbol[12], on, off);
-  draw_symbol(gRen, 248, 550, symbol[34], on, off);
-  draw_symbol(gRen, 256, 550, symbol[39], on, off);
-  draw_symbol(gRen, 264, 550, symbol[0], on, off);  
-  draw_symbol(gRen, 272, 550, symbol[0], on, off);
-  draw_symbol(gRen, 280, 550, symbol[0], on, off);
+  draw_symbol(gRen, 200, 550, symbol[25], on, off);
+  draw_symbol(gRen, 208, 550, symbol[17], on, off);  
+  draw_symbol(gRen, 216, 550, symbol[10], on, off);  
+  draw_symbol(gRen, 224, 550, symbol[28], on, off);
+  draw_symbol(gRen, 232, 550, symbol[14], on, off);  
+  draw_symbol(gRen, 240, 550, symbol[41], on, off);
+  draw_symbol(gRen, 248, 550, symbol[24], on, off);
+  draw_symbol(gRen, 256, 550, symbol[15], on, off);
+  draw_symbol(gRen, 264, 550, symbol[15], on, off);  
+  draw_symbol(gRen, 272, 550, symbol[28], on, off);
+  draw_symbol(gRen, 280, 550, symbol[14], on, off);
+  draw_symbol(gRen, 288, 550, symbol[29], on, off);
   
   /* Latency */
   draw_symbol(gRen, 200, 570, symbol[21], on, off);
