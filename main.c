@@ -21,11 +21,15 @@ typedef unsigned int Uint32;
 int WIDTH = 32 * HR + PD * 8 * 2;
 int HEIGHT = 32 * (VR + 2) + PD * 8 * 2;
 
+Uint32 *pixels;
+
 int ql = 0; /* Quit loop */
 
 typedef struct Clr
 {
+
  Uint8 r, g, b, a;
+
 } Clr;
 
 Clr set_clr(Uint8 r, Uint8 g, Uint8 b, Uint8 a)
@@ -41,8 +45,8 @@ Clr set_clr(Uint8 r, Uint8 g, Uint8 b, Uint8 a)
 }
 
 Uint8 symbol[][8] = {
-  { 0x00, 0x00, 0x1E, 0x30, 0x3E, 0x33, 0x6E, 0x00 }, /* a */
-};
+    { 0x3F, 0x66, 0x66, 0x3E, 0x66, 0x66, 0x3F, 0x00}, /* B */
+   };
 
 /* Routines  */
 
@@ -79,20 +83,19 @@ double get_time(void)
 
 /* Draw text*/
 void draw_symbol(SDL_Renderer *gRen, int px,  int py,
-                  char *symbol, Clr on, Clr off)
-{
-  for(int y = 0; y < 8; y++)
-  {
-    for(int x = 0; x < 8; x++)
+                  Uint8 *symbol, Clr on, Clr off)
+{ 
+  int x, y;
+  for(y = 0; y < 8; y++)
+    for(x = 0; x < 8; x++)
     {
-      if(symbol[y] & (1 << (7 - x )))
+      if(symbol[y] & (1 << (7 - x)))
         SDL_SetRenderDrawColor(gRen, on.r, on.g, on.b, on.a);
       else
         SDL_SetRenderDrawColor(gRen, off.r, off.g, off.b, off.a);
 
-      SDL_RenderDrawPoint(gRen, x + px, y + py);
+      SDL_RenderDrawPoint(gRen, px + x, py + y);
     }
-  }
 }
 /* rotating phasor line 
  * args: renderer, origin x, origin y, radius, and radians*/
@@ -171,12 +174,13 @@ int render_ui(void)
 
   SDL_SetRenderDrawColor(gRen, 0xFF, 0xFF, 0xFF, 255); /* Phasor  */
   draw_phasor_line(gRen, X_CENTER, Y_CENTER, 160, angle);
+  SDL_SetRenderDrawColor(gRen, 0x00, 0x00, 0x00, 255);
+  
   /* Draw BPM text */
   Clr on = set_clr(0xFF, 0xFF, 0xFF, 255);
   Clr off = set_clr(0x00, 0x00, 0x00, 255);
-  draw_symbol(gRen, 100, 100, *symbol, on, off);
+  draw_symbol(gRen, 100, 550, *symbol, on, off);
 
-  SDL_SetRenderDrawColor(gRen, 0x00, 0x00, 0x00, 255); /* Background */
   SDL_RenderPresent(gRen);
   
   SDL_DestroyTexture(gTxr);
@@ -211,6 +215,9 @@ int init(void)
         SDL_TEXTUREACCESS_STATIC,
         WIDTH,
         HEIGHT);
+  
+  if (gTxr == NULL)
+    return printf("Texture error: %s\n", SDL_GetError());
 
   return 1;
 }
