@@ -78,7 +78,8 @@ double get_time(void)
 /* User Interface */
 
 /* Draw text*/
-void draw_symbol(SDL_Renderer *gRen, char *symbol, Clr on, Clr off)
+void draw_symbol(SDL_Renderer *gRen, int px,  int py,
+                  char *symbol, Clr on, Clr off)
 {
   for(int y = 0; y < 8; y++)
   {
@@ -89,7 +90,7 @@ void draw_symbol(SDL_Renderer *gRen, char *symbol, Clr on, Clr off)
       else
         SDL_SetRenderDrawColor(gRen, off.r, off.g, off.b, off.a);
 
-      SDL_RenderDrawPoint(gRen, x, y);
+      SDL_RenderDrawPoint(gRen, x + px, y + py);
     }
   }
 }
@@ -173,7 +174,7 @@ int render_ui(void)
   /* Draw BPM text */
   Clr on = set_clr(0xFF, 0xFF, 0xFF, 255);
   Clr off = set_clr(0x00, 0x00, 0x00, 255);
-  draw_symbol(gRen, *symbol, on, off);
+  draw_symbol(gRen, 100, 100, *symbol, on, off);
 
   SDL_SetRenderDrawColor(gRen, 0x00, 0x00, 0x00, 255); /* Background */
   SDL_RenderPresent(gRen);
