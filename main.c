@@ -216,7 +216,18 @@ int render_ui(void)
   draw_symbol(gRen, 148, 550, symbol[0], on, off);
 
   /* Latency */
-
+  draw_symbol(gRen, 200, 550, symbol[16], on, off);
+  draw_symbol(gRen, 208, 550, symbol[11], on, off);  
+  draw_symbol(gRen, 216, 550, symbol[22], on, off);  
+  draw_symbol(gRen, 224, 550, symbol[14], on, off);
+  draw_symbol(gRen, 232, 550, symbol[18], on, off);  
+  draw_symbol(gRen, 240, 550, symbol[13], on, off);
+  draw_symbol(gRen, 248, 550, symbol[24], on, off);
+  draw_symbol(gRen, 256, 550, symbol[10], on, off);
+  draw_symbol(gRen, 264, 550, symbol[0], on, off);  
+  draw_symbol(gRen, 272, 550, symbol[0], on, off);
+  draw_symbol(gRen, 280, 550, symbol[0], on, off);
+  
   SDL_RenderPresent(gRen);
   SDL_DestroyTexture(gTxr);
   gTxr = NULL;
