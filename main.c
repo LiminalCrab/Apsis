@@ -81,8 +81,9 @@ Uint8 symbol[][16] = {
   { 0x00, 0x00, 0xc6, 0xc6, 0xc6, 0xc6, 0xd6, 0xd6, 0xd6, 0xfe, 0xee, 0x6c, 0x00, 0x00, 0x00, 0x00 }, //33 W
   { 0x00, 0x00, 0xc6, 0xc6, 0x6c, 0x7c, 0x38, 0x38, 0x7c, 0x6c, 0xc6, 0xc6, 0x00, 0x00, 0x00, 0x00 }, //34 X
   { 0x00, 0x00, 0x66, 0x66, 0x66, 0x66, 0x3c, 0x18, 0x18, 0x18, 0x18, 0x3c, 0x00, 0x00, 0x00, 0x00 }, //35 Y
-  { 0x00, 0xfe, 0xc6, 0x86, 0x0c, 0x18, 0x30, 0x60, 0xc2, 0xc6, 0xfe, 0x00, 0x00, 0x00, 0x00, 0x00 }  //36 Z
-
+  { 0x00, 0xfe, 0xc6, 0x86, 0x0c, 0x18, 0x30, 0x60, 0xc2, 0xc6, 0xfe, 0x00, 0x00, 0x00, 0x00, 0x00 }, //36 Z
+  { 0x00, 0x00, 0x00, 0x00, 0x18, 0x18, 0x00, 0x00, 0x00, 0x18, 0x18, 0x00, 0x00, 0x00, 0x00, 0x00 }, //37 :
+  { 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00 }, //38 NUL
 };
 
 /* Routines  */
@@ -228,29 +229,30 @@ int render_ui(void)
   draw_symbol(gRen, 148, 550, symbol[0], on, off);
 
   /* Phase offset */
-  draw_symbol(gRen, 200, 550, symbol[25], on, off);
-  draw_symbol(gRen, 208, 550, symbol[17], on, off);  
-  draw_symbol(gRen, 216, 550, symbol[10], on, off);  
-  draw_symbol(gRen, 224, 550, symbol[28], on, off);
-  draw_symbol(gRen, 232, 550, symbol[14], on, off);  
-  draw_symbol(gRen, 240, 550, symbol[41], on, off);
-  draw_symbol(gRen, 248, 550, symbol[24], on, off);
-  draw_symbol(gRen, 256, 550, symbol[15], on, off);
-  draw_symbol(gRen, 264, 550, symbol[15], on, off);  
-  draw_symbol(gRen, 272, 550, symbol[28], on, off);
-  draw_symbol(gRen, 280, 550, symbol[14], on, off);
-  draw_symbol(gRen, 288, 550, symbol[29], on, off);
+  draw_symbol(gRen, 200, 550, symbol[26], on, off);
+  draw_symbol(gRen, 208, 550, symbol[18], on, off);  
+  draw_symbol(gRen, 216, 550, symbol[11], on, off);  
+  draw_symbol(gRen, 224, 550, symbol[29], on, off);
+  draw_symbol(gRen, 232, 550, symbol[15], on, off);  
+  draw_symbol(gRen, 240, 550, symbol[38], on, off);
+  draw_symbol(gRen, 248, 550, symbol[25], on, off);
+  draw_symbol(gRen, 256, 550, symbol[16], on, off);
+  draw_symbol(gRen, 264, 550, symbol[16], on, off);  
+  draw_symbol(gRen, 272, 550, symbol[29], on, off);
+  draw_symbol(gRen, 280, 550, symbol[15], on, off);
+  draw_symbol(gRen, 288, 550, symbol[30], on, off);
   
   /* Latency */
-  draw_symbol(gRen, 200, 570, symbol[21], on, off);
-  draw_symbol(gRen, 208, 570, symbol[10], on, off);  
-  draw_symbol(gRen, 216, 570, symbol[29], on, off);  
-  draw_symbol(gRen, 224, 570, symbol[14], on, off);
-  draw_symbol(gRen, 232, 570, symbol[23], on, off);  
-  draw_symbol(gRen, 240, 570, symbol[12], on, off);
-  draw_symbol(gRen, 248, 570, symbol[34], on, off);
-  draw_symbol(gRen, 256, 570, symbol[39], on, off);
-  draw_symbol(gRen, 264, 570, symbol[0], on, off);  
+  draw_symbol(gRen, 200, 570, symbol[22], on, off);
+  draw_symbol(gRen, 208, 570, symbol[11], on, off);  
+  draw_symbol(gRen, 216, 570, symbol[30], on, off);  
+  draw_symbol(gRen, 224, 570, symbol[15], on, off);
+  draw_symbol(gRen, 232, 570, symbol[24], on, off);  
+  draw_symbol(gRen, 240, 570, symbol[13], on, off);
+  draw_symbol(gRen, 248, 570, symbol[35], on, off);
+  draw_symbol(gRen, 256, 570, symbol[37], on, off);
+  draw_symbol(gRen, 264, 570, symbol[0], on, off);
+  draw_symbol(gRen, 272, 570, symbol[0], on, off);
   
   SDL_RenderPresent(gRen);
   SDL_DestroyTexture(gTxr);
