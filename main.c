@@ -44,7 +44,7 @@ Clr set_clr(Uint8 r, Uint8 g, Uint8 b, Uint8 a)
   return clr;
 }
 
-Uint32 symbol[][8] = {   
+Uint16 symbol[][8] = {   
   { 0x0000, 0x0000, 0xfefe, 0x7c7c, 0x3838, 0x1000, 0x0000, 0x0000 },
   { 0x0000, 0x386c, 0xc6c6, 0xd6d6, 0xc6c6, 0x6c38, 0x0000, 0x0000 },
   { 0x0000, 0x1838, 0x7818, 0x1818, 0x1818, 0x187e, 0x0000, 0x0000 },
@@ -119,13 +119,13 @@ double get_time(void)
 
 /* Draw text*/
 void draw_symbol(SDL_Renderer *gRen, int px,  int py,
-                  Uint32 *symbol, Clr on, Clr off)
+                  Uint16 *symbol, Clr on, Clr off)
 { 
   int x, y;
-  for(y = 0; y < 8; y++)
+  for(y = 0; y < 16; y++)
     for(x = 0; x < 8; x++)
     {
-      if(symbol[y] & (1 << (7 - x)))
+      if(symbol[y] & (1 << (16 - x)))
         SDL_SetRenderDrawColor(gRen, on.r, on.g, on.b, on.a);
       else
         SDL_SetRenderDrawColor(gRen, off.r, off.g, off.b, off.a);
@@ -218,13 +218,13 @@ int render_ui(void)
   /* BPM */
   Clr on = set_clr(0xFF, 0xFF, 0xFF, 255);
   Clr off = set_clr(0x00, 0x00, 0x00, 255);
-  draw_symbol(gRen, 100, 550, symbol[11], on, off);
-  draw_symbol(gRen, 108, 550, symbol[25], on, off);
-  draw_symbol(gRen, 116, 550, symbol[22], on, off);
-  draw_symbol(gRen, 124, 550, symbol[39], on, off);
-  draw_symbol(gRen, 132, 550, symbol[0], on, off);
-  draw_symbol(gRen, 140, 550, symbol[0], on, off);
-  draw_symbol(gRen, 148, 550, symbol[0], on, off);
+  draw_symbol(gRen, 100, 550, symbol[13], on, off);
+  draw_symbol(gRen, 108, 550, symbol[28], on, off);
+  draw_symbol(gRen, 116, 550, symbol[24], on, off);
+  draw_symbol(gRen, 124, 550, symbol[41], on, off);
+  draw_symbol(gRen, 132, 550, symbol[1], on, off);
+  draw_symbol(gRen, 140, 550, symbol[1], on, off);
+  draw_symbol(gRen, 148, 550, symbol[1], on, off);
 
   /* Phase offset */
   draw_symbol(gRen, 200, 550, symbol[25], on, off);
