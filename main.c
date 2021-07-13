@@ -50,6 +50,7 @@ int HEIGHT = 32 * (VR + 2) + PD * 8 * 2;
 int ql = 0; /* Quit loop */
 
 int BPM = 0;
+int offset = 0;
 
 /* Font */
 
@@ -146,7 +147,9 @@ double get_time(void)
 
 }
 
-/* BPM Controller */
+/* BPM Controller 
+ * increasesd BPM (tempo) value.
+ * */
 void bpm_controller(int *temp, int value)
 {
   *temp = value;
@@ -161,6 +164,22 @@ void bpm_controller(int *temp, int value)
   printf("BPM: %d\n", BPM);
 }
 
+
+/*phase offset in miliseconds */
+void phase_offset(int *os, int value)
+{
+  *os = value;
+  if(offset <= 0)
+  {
+    offset = 0;
+  }
+  if(offset >= 10)
+  {
+    offset = 10;
+  }
+  printf("OFFSET: %d\n", offset);
+}
+
 /* key press events */
 void keypress(SDL_Event *e)
 {
@@ -171,6 +190,12 @@ void keypress(SDL_Event *e)
      break;
     case SDLK_k:
      bpm_controller(&BPM, BPM - 1);
+     break;
+    case SDLK_PAGEUP:
+     phase_offset(&offset, offset + 1);
+     break;
+    case SDLK_PAGEDOWN:
+     phase_offset(&offset, offset - 1);
      break;
   }
 
