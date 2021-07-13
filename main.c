@@ -132,6 +132,7 @@ void quit(void)
     exit(0);
 }
 
+
 /* clamp values to a specific range */
 int clmp(int val, int min, int max)
 {
@@ -148,8 +149,7 @@ double get_time(void)
 }
 
 /* BPM Controller 
- * increasesd BPM (tempo) value.
- * */
+ * increasesd BPM (tempo) value. */
 void bpm_controller(int *temp, int value)
 {
   *temp = value;
@@ -307,9 +307,9 @@ int render_ui(void)
   draw_symbol(gRen, 108, 550, symbol[26], on, off);
   draw_symbol(gRen, 116, 550, symbol[23], on, off);
   draw_symbol(gRen, 124, 550, symbol[10], on, off);
-  draw_symbol(gRen, 132, 550, symbol[0], on, off);
-  draw_symbol(gRen, 140, 550, symbol[0], on, off);
-  draw_symbol(gRen, 148, 550, symbol[0], on, off);
+  draw_symbol(gRen, 132, 550, symbol[(BPM/100) % 10], on, off);
+  draw_symbol(gRen, 140, 550, symbol[(BPM/10) % 10], on, off);
+  draw_symbol(gRen, 148, 550, symbol[BPM % 10], on, off);
 
   /* Phase offset */
   draw_symbol(gRen, 200, 550, symbol[26], on, off);
