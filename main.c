@@ -51,6 +51,7 @@ Uint32 *pixels;
 
 int ql = 0; /* Quit loop */
 
+int BPM = 000;
 typedef struct Clr
 {
 
@@ -142,11 +143,6 @@ double get_time(void)
   return clock_gettime(CLOCK_MONOTONIC, &tp) == 0 ? (double)tp.tv_sec \
     + (double)tp.tv_nsec/1000000000.0 : 0.0;
 
-}
-
-void hexchr(void)
-{
-  
 }
 
 
