@@ -49,7 +49,7 @@ int HEIGHT = 32 * (VR + 2) + PD * 8 * 2;
 
 int ql = 0; /* Quit loop */
 
-int BPM = 000;
+int BPM = 0;
 
 /* Font */
 
@@ -146,14 +146,32 @@ double get_time(void)
 
 }
 
+/* BPM Controller */
+void bpm_controller(int *temp, int value)
+{
+  *temp = value;
+  if(BPM <= 0)
+  {
+    BPM = 0;
+  }
+  if(BPM >= 300)
+  {
+    BPM = 300;
+  }
+  printf("BPM: %d\n", BPM);
+}
+
+/* key press events */
 void keypress(SDL_Event *e)
 {
   switch(e->key.keysym.sym)
   {
     case SDLK_j:
-     printf("UP");
+     bpm_controller(&BPM, BPM + 1);
+     break;
     case SDLK_k:
-     printf("DOWN");
+     bpm_controller(&BPM, BPM - 1);
+     break;
   }
 
 }
