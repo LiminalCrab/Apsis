@@ -47,11 +47,12 @@ typedef unsigned int Uint32;
 int WIDTH = 32 * HR + PD * 8 * 2;
 int HEIGHT = 32 * (VR + 2) + PD * 8 * 2;
 
-Uint32 *pixels;
-
 int ql = 0; /* Quit loop */
 
 int BPM = 000;
+
+/* Font */
+
 typedef struct Clr
 {
 
@@ -145,7 +146,17 @@ double get_time(void)
 
 }
 
+void keypress(SDL_Event *e)
+{
+  switch(e->key.keysym.sym)
+  {
+    case SDLK_j:
+     printf("UP");
+    case SDLK_k:
+     printf("DOWN");
+  }
 
+}
 /* User Interface */
 
 /* Draw text*/
@@ -336,12 +347,17 @@ int main(void)
     double elapsed, start = SDL_GetPerformanceCounter();
     while(SDL_PollEvent(&e) != 0)
     {
-      switch(e.type){
+      switch(e.type)
+      {
       case SDL_QUIT:
         quit();
         ql = 1;
         break;
+      case SDL_KEYDOWN: 
+        keypress(&e);
+        break;
       }
+
     }
     render_ui();
     elapsed = (SDL_GetPerformanceCounter() - start) / (double)SDL_GetPerformanceFrequency() * 1000.0f;
