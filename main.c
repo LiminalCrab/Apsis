@@ -49,7 +49,7 @@ int HEIGHT = 32 * (VR + 2) + PD * 8 * 2;
 
 int ql = 0; /* Quit loop */
 
-int BPM = 0;
+int BPM = 128;
 int offset = 0;
 
 /* Font */
@@ -285,7 +285,7 @@ int render_ui(void)
   
 
   /*Phasor angle and speed */
-  double speed = 0.1;
+  double speed = 0.1 * (double)BPM/100;
   double angle = speed * get_time(); 
   
   SDL_RenderClear(gRen);
