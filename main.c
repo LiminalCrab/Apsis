@@ -399,7 +399,7 @@ int main(void)
         quit();
         ql = 1;
         break;
-      case SDL_KEYDOWN: 
+        case SDL_KEYDOWN:
         keypress(&e);
         break;
       }
