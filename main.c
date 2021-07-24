@@ -161,7 +161,6 @@ void bpm_controller(int *temp, int value)
   {
     BPM = 300;
   }
-  printf("BPM: %d\n", BPM);
 }
 
 
@@ -177,7 +176,6 @@ void phase_offset(int *os, int value)
   {
     offset = 10;
   }
-  printf("OFFSET: %d\n", offset);
 }
 
 /* key press events */
